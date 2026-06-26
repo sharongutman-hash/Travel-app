@@ -1,0 +1,199 @@
+/* ── Mobile: stacked layout ─────────────────────────────── */
+.day-detail {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.detail-map {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.back-btn {
+  position: absolute; top: 16px; left: 16px; z-index: 1000;
+  background: #fff; border: none; border-radius: 12px;
+  padding: 8px 14px; font-size: 15px; font-weight: 600; color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15); cursor: pointer;
+}
+
+.day-overlay {
+  position: absolute; bottom: 16px; left: 16px; right: 16px; z-index: 1000;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(8px);
+  border-radius: 14px; padding: 10px 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.12);
+}
+.day-overlay-badge {
+  font-size: 11px; font-weight: 600; color: #1469F5;
+  background: #EBF2FF; border-radius: 6px;
+  padding: 2px 8px; display: inline-block; margin-bottom: 4px;
+}
+.day-overlay-title { font-size: 16px; font-weight: 700; color: #111; line-height: 1.2; }
+.day-overlay-date  { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+
+/* Bottom sheet — mobile */
+.bottom-sheet {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.1);
+  display: flex;
+  flex-direction: column;
+  height: 48vh;
+  min-height: 300px;
+  flex-shrink: 0;
+}
+
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: #e5e7eb; border-radius: 2px;
+  margin: 10px auto 0; flex-shrink: 0;
+}
+
+.tab-bar {
+  display: flex;
+  padding: 8px 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+  flex-shrink: 0;
+}
+.tab-btn {
+  flex: 1; padding: 8px 4px 10px;
+  border: none; background: transparent;
+  font-size: 13px; font-weight: 500; color: #9ca3af;
+  border-bottom: 2.5px solid transparent;
+  cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.tab-btn.active { color: #1469F5; border-bottom-color: #1469F5; }
+
+.sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Tab content ────────────────────────────────────────── */
+.tab-content { padding: 16px; }
+.empty-state { color: #9ca3af; font-size: 14px; text-align: center; padding: 24px 16px; }
+
+.summary-text { font-size: 14px; color: #374151; line-height: 1.65; margin-bottom: 16px; }
+.drive-card {
+  display: flex; align-items: center; gap: 12px;
+  background: #EBF2FF; border-radius: 12px; padding: 12px 14px;
+}
+.drive-emoji { font-size: 22px; }
+.drive-main  { font-size: 15px; font-weight: 600; color: #1469F5; }
+.drive-route { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+/* Attractions */
+.cat-section { margin-bottom: 16px; }
+.cat-heading { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.spot-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 12px;
+  background: #fafafa; margin-bottom: 6px;
+  cursor: pointer; transition: background .1s;
+  border: 1.5px solid transparent;
+}
+.spot-row.selected { background: #EBF2FF; border-color: var(--cat-color); }
+.spot-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0; color: #fff;
+}
+.spot-info { flex: 1; }
+.spot-name { font-size: 14px; font-weight: 500; color: #111; }
+.spot-note { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+.spot-pin  { font-size: 14px; color: #d1d5db; }
+
+/* Admin */
+.admin-section { margin-bottom: 20px; }
+.admin-section-title {
+  font-size: 11px; font-weight: 700; color: #9ca3af;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.res-row {
+  display: flex; align-items: center; gap: 10px;
+  background: #fafafa; border-radius: 12px;
+  padding: 10px 12px; margin-bottom: 6px;
+}
+.hotel-row-full { align-items: flex-start; }
+.res-ico  { font-size: 20px; flex-shrink: 0; }
+.res-info { flex: 1; min-width: 0; }
+.res-name { font-size: 13px; font-weight: 500; color: #111; }
+.res-meta { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+.res-about { font-size: 12px; color: #6b7280; margin-top: 5px; line-height: 1.5; }
+.res-contacts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.res-contact-btn {
+  font-size: 11px; padding: 4px 10px;
+  background: #f3f4f6; border-radius: 8px;
+  color: #1469F5; text-decoration: none;
+  border: 0.5px solid #e5e7eb;
+}
+.res-contact-btn:hover { background: #EBF2FF; }
+.res-address { font-size: 11px; color: #9ca3af; margin-top: 6px; }
+.res-note { font-size: 11px; color: #d97706; margin-top: 4px; background: #fef3c7; padding: 4px 8px; border-radius: 6px; }
+.res-status {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 6px; flex-shrink: 0; align-self: flex-start;
+}
+.res-status.confirmed  { background: #d1fae5; color: #065f46; }
+.res-status.free-cancel{ background: #d1fae5; color: #065f46; }
+.res-status.no-refund  { background: #fef3c7; color: #92400e; }
+
+/* ══ DESKTOP (≥ 900px) ═══════════════════════════════════ */
+@media (min-width: 900px) {
+  .day-detail {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  /* Map takes left half */
+  .detail-map {
+    flex: 1;
+    height: 100%;
+  }
+
+  /* Back button repositioned */
+  .back-btn { top: 20px; left: 20px; }
+
+  /* Overlay stays at bottom-left of the map panel */
+  .day-overlay {
+    bottom: 20px;
+    left: 20px;
+    right: auto;
+    max-width: 320px;
+  }
+
+  /* Right panel replaces bottom sheet */
+  .bottom-sheet {
+    width: 400px;
+    flex-shrink: 0;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: -4px 0 20px rgba(0,0,0,.08);
+    border-left: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Hide drag handle on desktop */
+  .sheet-handle { display: none; }
+
+  /* Taller tab area on desktop */
+  .tab-bar { padding: 16px 20px 0; }
+  .tab-btn { font-size: 14px; padding: 10px 8px 12px; }
+
+  .tab-content { padding: 20px; }
+
+  /* Day header inside the panel */
+  .day-overlay-title { font-size: 18px; }
+}
+
+/* ══ WIDE DESKTOP (≥ 1200px) ════════════════════════════ */
+@media (min-width: 1200px) {
+  .bottom-sheet { width: 460px; }
+}
