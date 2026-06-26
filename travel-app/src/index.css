@@ -18,3 +18,107 @@ a { text-decoration: none; color: inherit; }
   --radius: 16px;
   --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
+
+/* ── Top Bar (Language Toggle) ─────────────────────────── */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 16px;
+  background: rgba(15, 17, 23, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+}
+
+[dir="rtl"] .top-bar {
+  justify-content: flex-start;
+}
+
+.lang-toggle {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
+}
+
+.lang-toggle:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Push page content below fixed top bar */
+.home { padding-top: 44px; }
+
+/* ── RTL adjustments ───────────────────────────────────── */
+[dir="rtl"] .hero-content {
+  text-align: right;
+}
+
+[dir="rtl"] .day-card-body {
+  text-align: right;
+}
+
+[dir="rtl"] .arrow-icon {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .back-btn {
+  left: auto;
+  right: 12px;
+}
+
+[dir="rtl"] .day-overlay {
+  left: auto;
+  right: 0;
+  text-align: right;
+}
+
+[dir="rtl"] .res-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .res-info {
+  text-align: right;
+}
+
+[dir="rtl"] .res-status {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .spot-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .spot-info {
+  text-align: right;
+}
+
+[dir="rtl"] .day-admin-icons {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .day-card-top {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .drive-card {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+[dir="rtl"] .res-contacts {
+  justify-content: flex-end;
+}

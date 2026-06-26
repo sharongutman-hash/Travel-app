@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { trip, STOPS, HOTELS } from '../tripData'
+import { useLang } from '../LangContext'
+import { translations, tripTranslations } from '../i18n'
 import RouteMap from '../components/RouteMap'
 import './Home.css'
 
 function DayCard({ day, onClick, active }) {
+  const { lang } = useLang()
+  const t = translations[lang]
   const isTravel = day.type === 'travel'
   const stop = STOPS.find(s => s.id === day.stopId)
   const hotel = day.hotelId ? HOTELS[day.hotelId] : null
@@ -17,7 +21,7 @@ function DayCard({ day, onClick, active }) {
       )}
       <div className="day-card-body">
         <div className="day-card-top">
-          <span className="day-badge">Day {day.id}</span>
+          <span className="day-badge">{t.day} {day.id}</span>
           {hasAdmin && (
             <div className="day-admin-icons">
               {(day.arrival || day.departure) && <span title="Flight">✈️</span>}
@@ -45,6 +49,9 @@ export default function Home() {
   const [mobileView, setMobileView] = useState('list')
   const [activeDay, setActiveDay] = useState(null)
   const navigate = useNavigate()
+  const { lang } = useLang()
+  const t = translations[lang]
+  const tripT = tripTranslations[lang]
 
   function handleDayClick(day) {
     setActiveDay(day.id)
@@ -58,31 +65,29 @@ export default function Home() {
         <div className="hero-overlay" />
         <div className="hero-content">
           <div className="hero-flag">🇷🇴</div>
-          <h1 className="hero-title">{trip.title}</h1>
-          <p className="hero-sub">{trip.subtitle}</p>
+          <h1 className="hero-title">{tripT.title}</h1>
+          <p className="hero-sub">{tripT.subtitle}</p>
           <div className="hero-stats">
-            <span>{trip.dates}</span>
+            <span>{tripT.dates}</span>
             <span className="dot">·</span>
-            <span>{trip.days.length} days</span>
+            <span>{trip.days.length} {t.days}</span>
             <span className="dot">·</span>
-            <span>{trip.totalKm} km</span>
+            <span>{trip.totalKm} {t.km}</span>
           </div>
         </div>
       </div>
 
-      {/* Mobile toggle — hidden on desktop */}
+      {/* Mobile toggle */}
       <div className="mobile-toggle">
         <button className={mobileView === 'list' ? 'toggle-btn active' : 'toggle-btn'} onClick={() => setMobileView('list')}>
-          ☰ List
+          ☰ {t.list}
         </button>
         <button className={mobileView === 'map' ? 'toggle-btn active' : 'toggle-btn'} onClick={() => setMobileView('map')}>
-          🗺 Map
+          🗺 {t.map}
         </button>
       </div>
 
-      {/* Body — stacks on mobile, side-by-side on desktop */}
       <div className="home-body">
-        {/* Left: day list */}
         <div className={`home-list-col ${mobileView === 'map' ? 'mobile-hidden' : ''}`}>
           <div className="days-list">
             {trip.days.map(day => (
@@ -96,7 +101,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Right: map — sticky on desktop */}
         <div className={`home-map-col ${mobileView === 'list' ? 'mobile-hidden' : ''}`}>
           <div className="map-sticky">
             <RouteMap onStopClick={(stopId) => {

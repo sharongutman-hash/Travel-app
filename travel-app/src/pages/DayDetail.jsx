@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { trip, STOPS, SPOTS, CATEGORIES, HOTELS } from '../tripData'
+import { useLang } from '../LangContext'
+import { translations, categoryTranslations } from '../i18n'
 import DayMap from '../components/DayMap'
 import './DayDetail.css'
 
@@ -22,6 +24,9 @@ function TabSummary({ day }) {
 }
 
 function TabAttractions({ day, selectedSpotId, onSpotSelect }) {
+  const { lang } = useLang()
+  const t = translations[lang]
+  const catT = categoryTranslations[lang]
   const stop = STOPS.find(s => s.id === day.stopId)
   const spots = stop ? SPOTS.filter(s => s.stop === stop.id) : []
   const byCategory = {}
@@ -30,7 +35,7 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect }) {
     byCategory[s.cat].push(s)
   })
 
-  if (spots.length === 0) return <div className="tab-content empty-state">No attractions for this day.</div>
+  if (spots.length === 0) return <div className="tab-content empty-state">{t.noAttractions}</div>
 
   return (
     <div className="tab-content">
@@ -38,7 +43,7 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect }) {
         const cat = CATEGORIES[catKey]
         return (
           <div key={catKey} className="cat-section">
-            <div className="cat-heading" style={{ color: cat.color }}>{cat.emoji} {cat.label}</div>
+            <div className="cat-heading" style={{ color: cat.color }}>{cat.emoji} {catT[catKey]}</div>
             {catSpots.map(spot => (
               <div
                 key={spot.id}
@@ -62,105 +67,106 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect }) {
 }
 
 function TabAdmin({ day }) {
+  const { lang } = useLang()
+  const t = translations[lang]
   const hotel = day.hotelId ? HOTELS[day.hotelId] : null
 
   return (
     <div className="tab-content">
-      {/* Arrival (Day 1) */}
       {day.arrival && (
         <div className="admin-section">
-          <div className="admin-section-title">Arrival</div>
+          <div className="admin-section-title">{t.arrival}</div>
           <div className="res-row">
             <span className="res-ico">✈️</span>
             <div className="res-info">
-              <div className="res-name">Flight {day.arrival.flight} · EL AL</div>
+              <div className="res-name">{t.flightLabel} {day.arrival.flight} · {t.elal}</div>
               <div className="res-meta">TLV → BUH · Thu Aug 6 · lands {day.arrival.lands}</div>
-              <div className="res-meta">Booking ref: 7IGKV6</div>
+              <div className="res-meta">{t.bookingRef} 7IGKV6</div>
             </div>
-            <span className="res-status confirmed">✓ Confirmed</span>
+            <span className="res-status confirmed">{t.confirmed}</span>
           </div>
           <div className="res-row">
             <span className="res-ico">🚗</span>
             <div className="res-info">
-              <div className="res-name">Car pickup · Bucharest OTP</div>
-              <div className="res-meta">Pick up at {day.arrival.carPickup}</div>
+              <div className="res-name">{t.carPickup}</div>
+              <div className="res-meta">{t.pickUpAt} {day.arrival.carPickup}</div>
             </div>
-            <span className="res-status confirmed">✓ Confirmed</span>
+            <span className="res-status confirmed">{t.confirmed}</span>
           </div>
         </div>
       )}
 
-      {/* Departure (Day 11) */}
       {day.departure && (
         <div className="admin-section">
-          <div className="admin-section-title">Departure</div>
+          <div className="admin-section-title">{t.departure}</div>
           <div className="res-row">
             <span className="res-ico">🚗</span>
             <div className="res-info">
-              <div className="res-name">Return car · Bucharest OTP</div>
-              <div className="res-meta">Return by {day.departure.carReturn}</div>
+              <div className="res-name">{t.carReturn}</div>
+              <div className="res-meta">{t.returnBy} {day.departure.carReturn}</div>
             </div>
-            <span className="res-status confirmed">✓ Confirmed</span>
+            <span className="res-status confirmed">{t.confirmed}</span>
           </div>
           <div className="res-row">
             <span className="res-ico">✈️</span>
             <div className="res-info">
-              <div className="res-name">Flight {day.departure.flight} · EL AL</div>
+              <div className="res-name">{t.flightLabel} {day.departure.flight} · {t.elal}</div>
               <div className="res-meta">BUH → TLV · Sun Aug 16 · departs {day.departure.departs}</div>
-              <div className="res-meta">Booking ref: 7ILXY6</div>
+              <div className="res-meta">{t.bookingRef} 7ILXY6</div>
             </div>
-            <span className="res-status confirmed">✓ Confirmed</span>
+            <span className="res-status confirmed">{t.confirmed}</span>
           </div>
         </div>
       )}
 
-      {/* Hotel */}
       {hotel && (
         <div className="admin-section">
-          <div className="admin-section-title">Hotel</div>
+          <div className="admin-section-title">{t.hotel}</div>
           <div className="res-row hotel-row-full">
             <span className="res-ico">🏨</span>
             <div className="res-info">
               <div className="res-name">{hotel.name}</div>
-              <div className="res-meta">{hotel.dates} · {hotel.nights} night{hotel.nights > 1 ? 's' : ''} · {hotel.rooms} rooms · <strong>{hotel.price}</strong></div>
+              <div className="res-meta">{hotel.dates} · {hotel.nights} {hotel.nights > 1 ? t.nights : t.night} · {hotel.rooms} {t.rooms} · <strong>{hotel.price}</strong></div>
               {hotel.about && <div className="res-about">{hotel.about}</div>}
               <div className="res-contacts">
-                {hotel.phone    && <a href={`tel:${hotel.phone}`}    className="res-contact-btn">📞 {hotel.phone}</a>}
-                {hotel.email    && <a href={`mailto:${hotel.email}`} className="res-contact-btn">✉️ {hotel.email}</a>}
-                {hotel.website  && <a href={hotel.website} target="_blank" rel="noreferrer" className="res-contact-btn">🌐 Website</a>}
-                {hotel.mapsUrl  && <a href={hotel.mapsUrl} target="_blank" rel="noreferrer" className="res-contact-btn">📍 Google Maps</a>}
+                {hotel.phone   && <a href={`tel:${hotel.phone}`}    className="res-contact-btn">📞 {hotel.phone}</a>}
+                {hotel.email   && <a href={`mailto:${hotel.email}`} className="res-contact-btn">✉️ {hotel.email}</a>}
+                {hotel.website && <a href={hotel.website} target="_blank" rel="noreferrer" className="res-contact-btn">{t.website}</a>}
+                {hotel.mapsUrl && <a href={hotel.mapsUrl} target="_blank" rel="noreferrer" className="res-contact-btn">{t.googleMaps}</a>}
               </div>
               {hotel.address && <div className="res-address">📬 {hotel.address}</div>}
               {hotel.note    && <div className="res-note">ℹ️ {hotel.note}</div>}
             </div>
             <span className={`res-status ${hotel.cancellation === 'No refund' ? 'no-refund' : 'free-cancel'}`}>
-              {hotel.cancellation === 'No refund' ? '⚠ No refund' : '✓ Free cancel'}
+              {hotel.cancellation === 'No refund' ? t.noRefund : t.freeCancel}
             </span>
           </div>
         </div>
       )}
 
       {!day.arrival && !day.departure && !hotel && (
-        <div className="empty-state">No reservations for this day.</div>
+        <div className="empty-state">{t.noReservations}</div>
       )}
     </div>
   )
 }
 
-const TABS = [
-  { id: 'summary',     label: '📋 Summary' },
-  { id: 'attractions', label: '📍 Attractions' },
-  { id: 'admin',       label: '🗂 Admin' },
-]
-
 export default function DayDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { lang } = useLang()
+  const t = translations[lang]
   const day = trip.days.find(d => d.id === parseInt(id))
   const [activeTab, setActiveTab] = useState('summary')
   const [selectedSpot, setSelectedSpot] = useState(null)
 
-  if (!day) return <div style={{ padding: 20 }}>Day not found</div>
+  const TABS = [
+    { id: 'summary',     label: t.tabSummary },
+    { id: 'attractions', label: t.tabAttractions },
+    { id: 'admin',       label: t.tabAdmin },
+  ]
+
+  if (!day) return <div style={{ padding: 20 }}>{t.dayNotFound}</div>
 
   const isTravel = day.type === 'travel'
   const stop = STOPS.find(s => s.id === day.stopId)
@@ -169,9 +175,9 @@ export default function DayDetail() {
     <div className="day-detail">
       <div className="detail-map">
         <DayMap day={day} selectedSpotId={selectedSpot} onSpotClick={setSelectedSpot} />
-        <button className="back-btn" onClick={() => navigate('/')}>‹ Back</button>
+        <button className="back-btn" onClick={() => navigate('/')}>{t.back}</button>
         <div className="day-overlay">
-          <div className="day-overlay-badge">Day {day.id}</div>
+          <div className="day-overlay-badge">{t.day} {day.id}</div>
           <div className="day-overlay-title">
             {isTravel
               ? <>{day.from} <span style={{ color: '#1469F5' }}>→</span> {day.to}</>
