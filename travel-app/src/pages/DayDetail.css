@@ -1,6 +1,7 @@
 /* ── Mobile: stacked layout ─────────────────────────────── */
 .day-detail {
-  height: 100dvh;
+  height: calc(100dvh - 44px);
+  margin-top: 44px;
   display: flex;
   flex-direction: column;
   background: #f0f0f0;
