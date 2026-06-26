@@ -2,14 +2,16 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { trip, STOPS, SPOTS, CATEGORIES, HOTELS } from '../tripData'
 import { useLang } from '../LangContext'
-import { translations, categoryTranslations } from '../i18n'
+import { translations, categoryTranslations, daySummaries } from '../i18n'
 import DayMap from '../components/DayMap'
 import './DayDetail.css'
 
 function TabSummary({ day }) {
+  const { lang } = useLang()
+  const summary = daySummaries[lang][day.id] || day.summary
   return (
     <div className="tab-content">
-      <div className="summary-text">{day.summary}</div>
+      <div className="summary-text">{summary}</div>
       {day.type === 'travel' && day.drive && (
         <div className="drive-card">
           <span className="drive-emoji">🚗</span>

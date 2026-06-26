@@ -98,3 +98,32 @@ export const categoryTranslations = {
     viewpoint: "תצפית / נוף",
   },
 }
+
+export const daySummaries = {
+  en: {
+    1: "Land in Bucharest at 07:25, pick up the car at 11:00 and head to Snagov — only 40 km north. 1 night at Hotel Snagov Club on the shores of Lake Snagov. Afternoon walk around the lake and visit to the famous monastery — Vlad the Impaler's legendary tomb.",
+    2: "Morning drive 120 km south into the Carpathians. Arrive Sinaia and check in to Hotel Sinaia on the main boulevard. Afternoon visit to the stunning Peleș Castle — one of Romania's crown jewels and Tripadvisor #1 in Sinaia.",
+    3: "Full day in Sinaia. Pelișor Castle in the morning (Art Nouveau, built for Queen Marie), cable car up to Cota 2,000 for panoramic Carpathian views. Evening stroll through Sinaia Monastery complex.",
+    4: "Short 45-min drive to Brașov. Check in to The Pines Boutique Villa (rated #1 in Brașov). Explore the famous medieval Old Town — Council Square and the towering Black Church. Evening walk to Catherine's Gate.",
+    5: "Day trip to Bran Castle ('Dracula's Castle') and nearby Râșnov Fortress — both within 30 min. Consider the Libearty Bear Sanctuary in Zărnești. Back in the evening to explore Rope Street, the narrowest street in Romania.",
+    6: "The most scenic drive of the trip — Transfăgărășan highway cuts through the highest peaks of the Carpathians. Arrive at Pensiunea La Vâltoare in Gura Râului village, 18 km from Sibiu. 3 nights here at this 9.8-rated guesthouse.",
+    7: "Full day in Sibiu — one of Europe's most beautiful medieval cities. Start at Piața Mare (Great Square), visit Brukenthal Museum, cross the famous Bridge of Lies, and climb the Council Tower for views over the terracotta rooftops.",
+    8: "Day trip to Sighișoara — Dracula's birthplace and UNESCO World Heritage site, only 1 hour away. Explore the fortified old town on the hill. Return to Sibiu for the vast ASTRA Open Air Museum in Dumbrava Forest.",
+    9: "Drive through the Olt valley to Curtea de Argeș — the former medieval capital of Wallachia. Check in to Old Court (9.4 rated, 996 reviews). Afternoon visit to the magnificent Curtea de Argeș Cathedral, Romania's Royal Necropolis.",
+    10: "Drive to Poienari Citadel — the REAL Dracula fortress (1,480 steps up a cliff!). Then to Vidraru Dam with dramatic lake scenery. The full Transfăgărășan road is accessible from here. Last evening of the trip.",
+    11: "Head back to Bucharest. Return the car at OTP by 4:30 PM. 4+ hours buffer before LY9492 departs at 20:45. Lands Tel Aviv 23:20. End of trip.",
+  },
+  he: {
+    1: "נחיתה בבוקרשט ב-07:25, איסוף הרכב ב-11:00 ונסיעה לסנגוב — רק 40 ק\"מ צפונה. לילה אחד במלון סנגוב קלאב על שפת אגם סנגוב. אחר הצהריים — טיול מסביב לאגם וביקור במנזר המפורסם — קברו האגדי של ולד הדוקר.",
+    2: "נסיעה של 120 ק\"מ דרומה לתוך הקרפטים. הגעה לסינאיה וצ'ק-אין במלון סינאיה על השדרה הראשית. אחר הצהריים — ביקור בטירת פלש המרהיבה, אחד מיהלומי הכתר של רומניה ומקום #1 בסינאיה ב-Tripadvisor.",
+    3: "יום שלם בסינאיה. בבוקר — טירת פלישור (אר נובו, נבנתה למלכה מארי), עליה בטלפריק לקוטה 2,000 לנופים פנורמיים על הקרפטים. בערב — סיור מתחם מנזר סינאיה.",
+    4: "נסיעה קצרה של 45 דקות לברשוב. צ'ק-אין בוילת The Pines Boutique (מדורגת #1 בברשוב). סיור בעיר העתיקה המימי הנודעת — כיכר הקונסיל והכנסייה השחורה המתנשאת. בערב — טיול לשער קתרין.",
+    5: "טיול יומי לטירת ברן ('טירת דרקולה') ומבצר רשנוב הסמוך — שניהם במרחק 30 דקות. שקלו לבקר במקלט הדובים Libearty בזרנשטי. בערב חזרה לחקור את רחוב החבל — הרחוב הצר ביותר ברומניה.",
+    6: "הנסיעה הציורית ביותר של הטיול — כביש הטרנספגרשן חוצה את הפסגות הגבוהות של הקרפטים. הגעה לפנסיונה לה וולטואר בכפר גורה ראולוי, 18 ק\"מ מסיביו. 3 לילות באכסניה הכפרית המדורגת 9.8.",
+    7: "יום שלם בסיביו — אחת מהערים המימיות היפות באירופה. התחלה בכיכר פיאצה מארה (הכיכר הגדולה), ביקור במוזיאון ברוקנטל, חצייה על גשר השקרים, וטיפוס על מגדל הקונסיל לנוף על הגגות האדומים.",
+    8: "טיול יומי לסיגישוארה — עיר הולדתו של דרקולה ואתר מורשת עולמית של יונסק\"ו, שעה מסיביו. סיור בעיר העתיקה המבוצרת על הגבעה. חזרה לסיביו למוזיאון האוויר הפתוח ASTRA ביער דומברווה.",
+    9: "נסיעה דרך עמק אולט לקורטאה דה ארגש — בירת ולאכיה המימית. צ'ק-אין ב-Old Court (מדורג 9.4, 996 ביקורות). אחר הצהריים — ביקור בקתדרלת קורטאה דה ארגש המפוארת, בית הקברות המלכותי של רומניה.",
+    10: "נסיעה לציטדל פואנארי — מבצר דרקולה האמיתי (1,480 מדרגות על צוק!). לאחר מכן לסכר וידראר עם נוף הדרמטי של האגם. כביש הטרנספגרשן המלא נגיש מכאן. הערב האחרון של הטיול.",
+    11: "חזרה לבוקרשט. החזרת הרכב ב-OTP עד 16:30. מעל 4 שעות מרווח לפני המראת LY9492 ב-20:45. נחיתה בתל אביב ב-23:20. סוף הטיול.",
+  },
+}
