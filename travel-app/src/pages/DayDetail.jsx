@@ -1,10 +1,19 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { trip, STOPS, SPOTS, CATEGORIES, HOTELS } from '../tripData'
+import { trip, STOPS, SPOTS, CATEGORIES, CATEGORY_IMAGES, HOTELS } from '../tripData'
+import { useHotelDistances } from '../hooks/useRoute'
 import { useLang } from '../LangContext'
 import { translations, categoryTranslations, daySummaries } from '../i18n'
 import DayMap from '../components/DayMap'
 import './DayDetail.css'
+
+// Wikimedia thumbnails look like .../wikipedia/commons/thumb/a/ab/File.jpg/960px-File.jpg
+// Strip /thumb/ and the trailing size segment to get the full-resolution original.
+function fullRes(src) {
+  if (!src) return src
+  const m = src.match(/^(https:\/\/upload\.wikimedia\.org\/wikipedia\/[^/]+)\/thumb\/(.+)\/[^/]+$/)
+  return m ? `${m[1]}/${m[2]}` : src
+}
 
 function TabSummary({ day }) {
   const { lang } = useLang()
@@ -31,6 +40,12 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect }) {
   const catT = categoryTranslations[lang]
   const stop = STOPS.find(s => s.id === day.stopId)
   const spots = stop ? SPOTS.filter(s => s.stop === stop.id) : []
+
+  // Origin for "distance from hotel": the day's hotel, else the stop itself
+  const hotel = day.hotelId ? HOTELS[day.hotelId] : null
+  const origin = hotel?.coords || stop?.coords || null
+  const distances = useHotelDistances(origin, spots)
+
   const byCategory = {}
   spots.forEach(s => {
     if (!byCategory[s.cat]) byCategory[s.cat] = []
@@ -46,21 +61,73 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect }) {
         return (
           <div key={catKey} className="cat-section">
             <div className="cat-heading" style={{ color: cat.color }}>{cat.emoji} {catT[catKey]}</div>
-            {catSpots.map(spot => (
-              <div
-                key={spot.id}
-                className={`spot-row ${selectedSpotId === spot.id ? 'selected' : ''}`}
-                onClick={() => onSpotSelect(spot.id === selectedSpotId ? null : spot.id)}
-                style={{ '--cat-color': cat.color }}
-              >
-                <div className="spot-dot" style={{ background: cat.color }}>{cat.emoji}</div>
-                <div className="spot-info">
-                  <div className="spot-name">{spot.name}</div>
-                  {spot.note && <div className="spot-note">{spot.note}</div>}
+            {catSpots.map(spot => {
+              const selected = selectedSpotId === spot.id
+              const d = distances[spot.id]
+              const distLabel = d
+                ? (d.durationMin != null
+                    ? `${d.distanceKm} ${t.km} · ${d.durationMin} min`
+                    : `≈${d.distanceKm} ${t.km}`)
+                : null
+              const img = spot.image || CATEGORY_IMAGES[spot.cat]
+              const dirUrl = origin
+                ? `https://www.google.com/maps/dir/?api=1&origin=${origin[0]},${origin[1]}&destination=${spot.coords[0]},${spot.coords[1]}&travelmode=driving`
+                : `https://www.google.com/maps/search/?api=1&query=${spot.coords[0]},${spot.coords[1]}`
+              return (
+                <div
+                  key={spot.id}
+                  className={`spot-card ${selected ? 'selected' : ''}`}
+                  style={{ '--cat-color': cat.color }}
+                >
+                  <div className="spot-row" onClick={() => onSpotSelect(selected ? null : spot.id)}>
+                    <div className="spot-dot" style={{ background: cat.color }}>{cat.emoji}</div>
+                    <div className="spot-info">
+                      <div className="spot-name">{spot.name}</div>
+                      {spot.note && <div className="spot-note">{spot.note}</div>}
+                      <div className="spot-meta">
+                        {distLabel && (
+                          <span className="spot-chip" title={d.straight ? t.aerialDist : ''}>
+                            🏨 {distLabel} {t.fromHotel}
+                          </span>
+                        )}
+                        {spot.duration && <span className="spot-chip">⏱ {spot.duration}</span>}
+                      </div>
+                    </div>
+                    <span className={`spot-caret ${selected ? 'open' : ''}`}>⌄</span>
+                  </div>
+                  {selected && (
+                    <div className="spot-detail">
+                      <a
+                        className="spot-img-link"
+                        href={fullRes(img)}
+                        target="_blank"
+                        rel="noreferrer"
+                        title={t.enlarge}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <img
+                          className="spot-img"
+                          src={img}
+                          alt={spot.name}
+                          loading="lazy"
+                          onError={e => { const fb = CATEGORY_IMAGES[spot.cat]; if (e.currentTarget.src !== fb) e.currentTarget.src = fb }}
+                        />
+                        <span className="spot-img-zoom">⤢</span>
+                      </a>
+                      {spot.desc && <p className="spot-desc">{spot.desc}</p>}
+                      <div className="spot-actions">
+                        <a href={dirUrl} target="_blank" rel="noreferrer" className="spot-action-btn">{t.directions}</a>
+                        <a
+                          href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(spot.name + ' Romania')}`}
+                          target="_blank" rel="noreferrer"
+                          className="spot-action-btn ghost"
+                        >{t.photos}</a>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <span className="spot-pin">📍</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )
       })}
