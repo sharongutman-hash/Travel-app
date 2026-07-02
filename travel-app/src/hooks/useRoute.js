@@ -6,6 +6,19 @@ const cache = {}
 // OSRM public demo server — free, no API key, real road routing
 const OSRM = 'https://router.project-osrm.org/route/v1/driving'
 
+// Great-circle (straight-line) distance in km — instant, used as an estimate
+// until the real driving distance comes back from OSRM.
+export function haversineKm(a, b) {
+  const R = 6371
+  const toRad = d => (d * Math.PI) / 180
+  const dLat = toRad(b[0] - a[0])
+  const dLon = toRad(b[1] - a[1])
+  const lat1 = toRad(a[0])
+  const lat2 = toRad(b[0])
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
+  return Math.round(2 * R * Math.asin(Math.sqrt(h)))
+}
+
 async function fetchRoute(from, to) {
   // OSRM expects lon,lat order
   const url = `${OSRM}/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`
@@ -67,4 +80,55 @@ export function useMultiRoute(legs) {
   }, [key])
 
   return { routes, loading }
+}
+
+
+// Driving distance/time from a single origin (e.g. the hotel) to many targets.
+// targets: [{ id, coords }]. Returns a map id -> { distanceKm, durationMin, straight }.
+// Shows an instant straight-line estimate first, then upgrades to real road
+// distances as OSRM responds. Only the current day's spots are ever requested.
+export function useHotelDistances(origin, targets) {
+  const [dist, setDist] = useState({})
+
+  const key = origin
+    ? `${origin[0]},${origin[1]}|` + targets.map(t => `${t.id}:${t.coords[0]},${t.coords[1]}`).join(';')
+    : ''
+
+  useEffect(() => {
+    if (!origin || !targets.length) { setDist({}); return }
+
+    // 1) Instant straight-line estimate so the UI never waits
+    const initial = {}
+    targets.forEach(t => {
+      initial[t.id] = { distanceKm: haversineKm(origin, t.coords), durationMin: null, straight: true }
+    })
+    setDist(initial)
+
+    // 2) Upgrade to real driving distances
+    let cancelled = false
+    Promise.all(
+      targets.map(t => {
+        const k = `${origin[0]},${origin[1]}|${t.coords[0]},${t.coords[1]}`
+        const p = cache[k]
+          ? Promise.resolve(cache[k])
+          : fetchRoute(origin, t.coords).then(r => { cache[k] = r; return r }).catch(() => null)
+        return p.then(r => [t.id, r])
+      })
+    ).then(results => {
+      if (cancelled) return
+      setDist(prev => {
+        const next = { ...prev }
+        results.forEach(([id, r]) => {
+          if (r && r.distanceKm != null) {
+            next[id] = { distanceKm: r.distanceKm, durationMin: r.durationMin, straight: false }
+          }
+        })
+        return next
+      })
+    })
+
+    return () => { cancelled = true }
+  }, [key])
+
+  return dist
 }
