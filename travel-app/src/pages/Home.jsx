@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { trip, STOPS, HOTELS } from '../tripData'
 import { useLang } from '../LangContext'
-import { translations, tripTranslations } from '../i18n'
+import { translations, tripTranslations, welcomeTranslations } from '../i18n'
 import RouteMap from '../components/RouteMap'
 import './Home.css'
 
@@ -52,6 +52,7 @@ export default function Home() {
   const { lang } = useLang()
   const t = translations[lang]
   const tripT = tripTranslations[lang]
+  const w = welcomeTranslations[lang]
 
   function handleDayClick(day) {
     setActiveDay(day.id)
@@ -64,6 +65,7 @@ export default function Home() {
       <div className="hero" style={{ backgroundImage: `url(${trip.heroImage})` }}>
         <div className="hero-overlay" />
         <div className="hero-content">
+          <button className="hero-back" onClick={() => navigate('/')}>{w.backToTrips}</button>
           <div className="hero-flag">🇷🇴</div>
           <h1 className="hero-title">{tripT.title}</h1>
           <p className="hero-sub">{tripT.subtitle}</p>

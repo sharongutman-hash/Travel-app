@@ -79,6 +79,45 @@ export const translations = {
   },
 }
 
+export const welcomeTranslations = {
+  en: {
+    brand: 'Trip Planner',
+    heading: 'Your trips',
+    sub: 'Pick up where you left off, or start planning your next adventure.',
+    ready: 'Ready',
+    backToTrips: '‹ All trips',
+    buildTitle: 'Build a new trip',
+    buildSub: 'Start a new adventure',
+    modalTitle: 'Build a new trip',
+    modalIntro: 'New trips are crafted together with your travel assistant. Tell it where you’re headed and share these four things — it generates a full itinerary app, just like this one.',
+    modalItems: [
+      { emoji: '✈️', label: 'Flights', desc: 'Outbound and return, with booking refs.' },
+      { emoji: '🚗', label: 'Car reservation', desc: 'Pickup and drop-off details.' },
+      { emoji: '🏨', label: 'Hotel reservations', desc: 'One per stop along the route.' },
+      { emoji: '📍', label: 'Attractions & highlights', desc: 'The places you want to see.' },
+    ],
+    modalClose: 'Got it',
+  },
+  he: {
+    brand: 'מתכנן טיולים',
+    heading: 'הטיולים שלך',
+    sub: 'המשיכו מאיפה שעצרתם, או התחילו לתכנן את ההרפתקה הבאה.',
+    ready: 'מוכן',
+    backToTrips: 'כל הטיולים ›',
+    buildTitle: 'בניית טיול חדש',
+    buildSub: 'התחלת הרפתקה חדשה',
+    modalTitle: 'בניית טיול חדש',
+    modalIntro: 'טיולים חדשים נבנים יחד עם עוזר הנסיעות שלך. ספרו לאן אתם נוסעים ושתפו את ארבעת הדברים האלה — וייווצר אפליקציית מסלול מלאה, בדיוק כמו זו.',
+    modalItems: [
+      { emoji: '✈️', label: 'טיסות', desc: 'הלוך וחזור, עם מספרי הזמנה.' },
+      { emoji: '🚗', label: 'השכרת רכב', desc: 'פרטי איסוף והחזרה.' },
+      { emoji: '🏨', label: 'הזמנות מלון', desc: 'אחת לכל תחנה במסלול.' },
+      { emoji: '📍', label: 'אטרקציות ונקודות עניין', desc: 'המקומות שתרצו לראות.' },
+    ],
+    modalClose: 'הבנתי',
+  },
+}
+
 export const tripTranslations = {
   en: {
     title: "Romania Road Trip",

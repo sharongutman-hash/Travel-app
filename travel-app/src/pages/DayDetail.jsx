@@ -244,7 +244,7 @@ export default function DayDetail() {
     <div className="day-detail">
       <div className="detail-map">
         <DayMap day={day} selectedSpotId={selectedSpot} onSpotClick={setSelectedSpot} />
-        <button className="back-btn" onClick={() => navigate('/')}>{t.back}</button>
+        <button className="back-btn" onClick={() => navigate('/trip/romania')}>{t.back}</button>
         <div className="day-overlay">
           <div className="day-overlay-badge">{t.day} {day.id}</div>
           <div className="day-overlay-title">

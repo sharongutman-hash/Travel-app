@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { LangProvider, useLang } from './LangContext'
 import { translations } from './i18n'
+import Welcome from './pages/Welcome'
 import Home from './pages/Home'
 import DayDetail from './pages/DayDetail'
 
@@ -28,7 +29,8 @@ export default function App() {
       <BrowserRouter basename={basename}>
         <TopBar />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Welcome />} />
+          <Route path="/trip/:tripId" element={<Home />} />
           <Route path="/day/:id" element={<DayDetail />} />
         </Routes>
       </BrowserRouter>
