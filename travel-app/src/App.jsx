@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { LangProvider, useLang } from './LangContext'
 import { translations } from './i18n'
 import Welcome from './pages/Welcome'
@@ -10,6 +10,9 @@ const basename = import.meta.env.BASE_URL
 function TopBar() {
   const { lang, setLang } = useLang()
   const t = translations[lang]
+  const { pathname } = useLocation()
+  // The Welcome screen has its own header + language toggle.
+  if (pathname === '/') return null
   return (
     <div className="top-bar">
       <button
