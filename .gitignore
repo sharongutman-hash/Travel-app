@@ -1,3 +1,6 @@
 .DS_Store
 Travel app/
 travel-app/src/tripData.backup.js
+
+# Local Claude agents & config (trip planner lives here)
+.claude/
