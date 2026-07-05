@@ -1,16 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import '../leafletSetup'
 import { STOPS, SPOTS, CATEGORIES, trip } from '../tripData'
 import { useRoute } from '../hooks/useRoute'
-
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-})
+import { useLang } from '../LangContext'
+import { pick } from '../i18n'
+import { BASE_LAYERS, DEFAULT_LAYER } from '../mapLayers'
+import { LayerSwitcher, FullscreenButton, LocateButton } from './MapControls'
 
 function hotelIcon() {
   return L.divIcon({
@@ -37,7 +35,18 @@ function FitBounds({ coords }) {
   return null
 }
 
-function RouteLayer({ from, to }) {
+// Pan/zoom to the selected spot when it changes (§2.4 list → map sync).
+function FlyToSpot({ spotId }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!spotId) return
+    const spot = SPOTS.find(s => s.id === spotId)
+    if (spot) map.flyTo(spot.coords, Math.max(map.getZoom(), 13), { duration: 0.6 })
+  }, [spotId])
+  return null
+}
+
+function RouteLayer({ from, to, loading }) {
   const { coords, distanceKm, durationMin } = useRoute(from, to)
   if (!coords) return null
   const hours = Math.floor(durationMin / 60)
@@ -47,7 +56,7 @@ function RouteLayer({ from, to }) {
     : null
   return (
     <>
-      <Polyline positions={coords} color="#1469F5" weight={4} opacity={0.85} />
+      <Polyline positions={coords} color="#1469F5" weight={4} opacity={0.85} dashArray={loading ? '6 8' : null} />
       {label && (
         <Marker
           position={coords[Math.floor(coords.length / 2)]}
@@ -62,63 +71,77 @@ function RouteLayer({ from, to }) {
   )
 }
 
-export default function DayMap({ day, selectedSpotId, onSpotClick }) {
+export default function DayMap({ day, selectedSpotId, onSpotClick, activeCats = new Set() }) {
+  const { lang } = useLang()
+  const [layerId, setLayerId] = useState(DEFAULT_LAYER)
+  const [map, setMap] = useState(null)
+  const layer = BASE_LAYERS.find(l => l.id === layerId) || BASE_LAYERS[0]
+
   const stop    = STOPS.find(s => s.id === day.stopId)
-  // Derive previous stop from previous day rather than parsing the "from" string
   const dayIdx  = trip.days.findIndex(d => d.id === day.id)
   const prevDay = trip.days[dayIdx - 1]
   const fromStop = day.type === 'travel'
-    ? STOPS.find(s => s.id === (prevDay?.stopId ?? 'otp'))
+    ? STOPS.find(s => s.id === (prevDay?.stopId ?? STOPS[0]?.id))
     : null
 
-  const spots = stop ? SPOTS.filter(s => s.stop === stop.id) : []
+  const allSpots = stop ? SPOTS.filter(s => s.stop === stop.id) : []
+  const spots = allSpots.filter(s => activeCats.size === 0 || activeCats.has(s.cat))
 
   const allCoords = []
   if (fromStop) allCoords.push(fromStop.coords)
   if (stop)     allCoords.push(stop.coords)
-  spots.forEach(s => allCoords.push(s.coords))
+  allSpots.forEach(s => allCoords.push(s.coords))
 
   return (
-    <MapContainer
-      center={stop ? stop.coords : [45.4, 25.0]}
-      zoom={9}
-      style={{ height: '100%', width: '100%' }}
-      scrollWheelZoom={true}
-      zoomControl={false}
-    >
-      <TileLayer
-        attribution='&copy; OpenStreetMap'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-      />
+    <div className="map-wrap map-wrap-full">
+      <div className="map-topleft">
+        <LayerSwitcher value={layerId} onChange={setLayerId} />
+        <FullscreenButton map={map} />
+        <LocateButton map={map} />
+      </div>
 
-      {allCoords.length > 1 && <FitBounds coords={allCoords} />}
+      <MapContainer
+        ref={setMap}
+        center={stop ? stop.coords : (STOPS[0]?.coords || [0, 0])}
+        zoom={9}
+        style={{ height: '100%', width: '100%' }}
+        scrollWheelZoom
+        zoomControl={false}
+      >
+        <TileLayer key={layer.id} attribution={layer.attribution} url={layer.url} />
+        {allCoords.length > 1 && <FitBounds coords={allCoords} />}
+        <FlyToSpot spotId={selectedSpotId} />
 
-      {day.type === 'travel' && fromStop && stop && (
-        <RouteLayer from={fromStop.coords} to={stop.coords} />
-      )}
+        {day.type === 'travel' && fromStop && stop && (
+          <RouteLayer from={fromStop.coords} to={stop.coords} />
+        )}
 
-      {stop && (
-        <Marker position={stop.coords} icon={hotelIcon()}>
-          <Popup><strong>{day.hotelId ? stop.name : 'Drop-off'}</strong></Popup>
-        </Marker>
-      )}
-
-      {spots.map(spot => {
-        const cat = CATEGORIES[spot.cat]
-        return (
-          <Marker
-            key={spot.id}
-            position={spot.coords}
-            icon={spotIcon(cat.color, cat.emoji, selectedSpotId === spot.id)}
-            eventHandlers={{ click: () => onSpotClick?.(spot.id === selectedSpotId ? null : spot.id) }}
-          >
-            <Popup>
-              <strong>{spot.name}</strong>
-              {spot.note && <><br /><em>{spot.note}</em></>}
-            </Popup>
+        {stop && (
+          <Marker position={stop.coords} icon={hotelIcon()}>
+            <Popup><strong>{day.hotelId ? stop.name : 'Drop-off'}</strong></Popup>
           </Marker>
-        )
-      })}
-    </MapContainer>
+        )}
+
+        {spots.map(spot => {
+          const cat = CATEGORIES[spot.cat]
+          return (
+            <Marker
+              key={spot.id}
+              position={spot.coords}
+              icon={spotIcon(cat.color, cat.emoji, selectedSpotId === spot.id)}
+              eventHandlers={{ click: () => onSpotClick?.(spot.id === selectedSpotId ? null : spot.id) }}
+            >
+              <Popup>
+                {spot.image && <img src={spot.image} alt={pick(spot.name, lang)} className="popup-thumb" loading="lazy" />}
+                <strong>{pick(spot.name, lang)}</strong>
+                {spot.note && <><br /><em>{pick(spot.note, lang)}</em></>}
+                <br />
+                <button className="popup-details" onClick={() => onSpotClick?.(spot.id)}>Details ›</button>
+              </Popup>
+            </Marker>
+          )
+        })}
+      </MapContainer>
+    </div>
   )
 }

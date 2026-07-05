@@ -64,6 +64,7 @@
   padding: 4px 10px; border-radius: 16px;
 }
 .glance-badge-today { background: #12805c; }
+.glance-badge-done { background: #6b7280; }
 .glance-date { font-size: 12px; color: #4b5563; }
 
 .glance-route { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -113,7 +114,7 @@
   display: flex; gap: 12px;
   overflow-x: auto;
   padding: 4px 20px 12px;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 .days-scroll::-webkit-scrollbar { height: 0; }
@@ -150,6 +151,37 @@
 }
 .day-card2-meta { font-size: 12px; color: #6c757d; }
 
+/* ── Agenda list ("View List" mode) ────────────────────── */
+.days-list {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 4px 20px 12px;
+}
+.agenda-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  background: #fff; border: none; cursor: pointer;
+  border-radius: 12px; padding: 12px 14px;
+  text-align: inherit; font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  transition: transform .12s, box-shadow .12s;
+}
+.agenda-row:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,.12); }
+.agenda-daynum {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+  background: #0064d6; color: #fff;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.agenda-body { flex: 1; min-width: 0; }
+.agenda-title {
+  font-size: 14px; font-weight: 600; color: #0064d6; line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.agenda-meta { font-size: 12px; color: #6c757d; margin-top: 2px; }
+.agenda-caret { flex: 0 0 auto; color: #9aa5b1; font-size: 18px; font-weight: 600; }
+[dir="rtl"] .agenda-row { flex-direction: row-reverse; }
+[dir="rtl"] .agenda-caret { transform: scaleX(-1); }
+
 /* ══ Wide screens (> 740px) ════════════════════════════════ */
 @media (min-width: 741px) {
   /* All components fill the full width */
@@ -168,6 +200,7 @@
   /* Days row uses the wider gutters and bigger cards */
   .days-head { padding-left: 32px; padding-right: 32px; }
   .days-scroll { padding-left: 32px; padding-right: 32px; }
+  .days-list { padding-left: 32px; padding-right: 32px; }
   .day-card2 { width: 244px; }
   .day-card2-img { height: 156px; }
   .day-card2-title { min-height: 40px; }

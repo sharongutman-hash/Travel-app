@@ -1,38 +1,60 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { trips } from '../trips'
 import { useLang } from '../LangContext'
-import { welcomeTranslations } from '../i18n'
 import './Welcome.css'
 
-// Strings specific to the redesigned welcome screen.
 const strings = {
   en: {
-    welcomeBack: 'Welcome back',
-    search: 'Where to go?',
-    newIdeas: 'New ideas',
-    upcoming: 'Upcoming',
-    buildSub: 'Start your adventure',
-    days: 'days',
-    km: 'km',
+    welcomeBack: 'Welcome back', search: 'Where to go?', newIdeas: 'New ideas',
+    upcoming: 'Upcoming', buildTitle: 'Build a new trip', buildSub: 'Start your adventure',
+    days: 'days', km: 'km', noResults: 'No trips match your search',
+    step: 'Step', next: 'Next', back: 'Back', close: 'Close', finish: 'Finish',
+    destination: 'Destination / region', origin: 'Origin airport (code)',
+    start: 'Start date', end: 'End date',
+    travellers: 'Travellers', rooms: 'Rooms', pace: 'Pace', interests: 'Interests',
+    relaxed: 'Relaxed', balanced: 'Balanced', packed: 'Packed',
+    bookingsLabel: 'Already booked? Paste flight / hotel / car confirmations',
+    bookingsPh: 'e.g. EL AL LY573 TLV→BUH Thu Aug 6 04:45→07:25 ref 7IGKV6\nHotel Sinaia, Aug 7–9, 2 rooms…',
+    review: 'Review your brief',
+    briefHint: 'Copy this into the /new-trip agent to generate the app.',
+    copyBrief: 'Copy brief', copied: 'Copied ✓', download: 'Download .md',
+    reqNote: 'Fields left blank become "please suggest" in the brief.',
   },
   he: {
-    welcomeBack: 'ברוך שובך',
-    search: 'לאן נוסעים?',
-    newIdeas: 'רעיונות חדשים',
-    upcoming: 'הקרוב',
-    buildSub: 'התחילו הרפתקה',
-    days: 'ימים',
-    km: 'ק"מ',
+    welcomeBack: 'ברוך שובך', search: 'לאן נוסעים?', newIdeas: 'רעיונות חדשים',
+    upcoming: 'הקרוב', buildTitle: 'בניית טיול חדש', buildSub: 'התחילו הרפתקה',
+    days: 'ימים', km: 'ק"מ', noResults: 'לא נמצאו טיולים מתאימים',
+    step: 'שלב', next: 'הבא', back: 'חזרה', close: 'סגירה', finish: 'סיום',
+    destination: 'יעד / אזור', origin: 'שדה תעופה מוצא (קוד)',
+    start: 'תאריך התחלה', end: 'תאריך סיום',
+    travellers: 'נוסעים', rooms: 'חדרים', pace: 'קצב', interests: 'תחומי עניין',
+    relaxed: 'רגוע', balanced: 'מאוזן', packed: 'עמוס',
+    bookingsLabel: 'כבר הזמנתם? הדביקו אישורי טיסה / מלון / רכב',
+    bookingsPh: 'לדוגמה: אל על LY573 TLV→BUH …',
+    review: 'סקירת הבריף',
+    briefHint: 'העתיקו את זה לסוכן /new-trip כדי לייצר את האפליקציה.',
+    copyBrief: 'העתקת בריף', copied: 'הועתק ✓', download: 'הורדת .md',
+    reqNote: 'שדות ריקים יהפכו ל"נא להציע" בבריף.',
   },
 }
 
-// Inspirational trips the assistant can build next.
+const INTERESTS = [
+  { key: 'castles',  en: 'Castles',  he: 'טירות' },
+  { key: 'nature',   en: 'Nature',   he: 'טבע' },
+  { key: 'food',     en: 'Food',     he: 'אוכל' },
+  { key: 'beaches',  en: 'Beaches',  he: 'חופים' },
+  { key: 'museums',  en: 'Museums',  he: 'מוזיאונים' },
+  { key: 'history',  en: 'History',  he: 'היסטוריה' },
+  { key: 'hiking',   en: 'Hiking',   he: 'טיולים רגליים' },
+  { key: 'nightlife',en: 'Nightlife',he: 'חיי לילה' },
+]
+
 const suggestions = [
-  { name: 'Swiss-Belhotel Rainforest Kuta', addr: 'Jl. Sunset Road No. 101, Kuta, Bali, Indonesia', days: 10, km: 1500 },
-  { name: 'Ayana Resort and Spa Bali', addr: 'Jl. Karang Mas Sejahtera, Jimbaran, Bali, Indonesia', days: 7, km: 1200 },
-  { name: 'W Bali - Seminyak', addr: 'Jl. Petitenget No. 1000x, Seminyak, Bali, Indonesia', days: 5, km: 800 },
-  { name: 'Four Seasons Resort Bali at Sayan', addr: 'Sayan, Ubud, Bali, Indonesia', days: 8, km: 950 },
+  { name: 'Bali Beaches & Temples', place: 'Indonesia', days: 7, km: 1200 },
+  { name: 'Amalfi Coast Drive',     place: 'Italy',     days: 6, km: 520 },
+  { name: 'Iceland Ring Road',      place: 'Iceland',   days: 8, km: 1300 },
+  { name: 'Kyoto & Osaka',          place: 'Japan',     days: 5, km: 600 },
 ]
 
 function TripCard({ trip, onClick }) {
@@ -48,7 +70,7 @@ function TripCard({ trip, onClick }) {
       <div className="wt-card-body">
         <div className="wt-card-title">{meta.title}</div>
         <div className="wt-card-sub">{meta.subtitle}</div>
-        <div className="wt-card-meta">{meta.dates} · {trip.days} {s.days} · {trip.km} {s.km}</div>
+        <div className="wt-card-meta">{meta.dates} · {trip.days} {s.days}{trip.km ? ` · ${trip.km} ${s.km}` : ''}</div>
       </div>
     </button>
   )
@@ -60,45 +82,215 @@ function Suggestion({ item, onClick }) {
   return (
     <button className="wt-suggestion" onClick={onClick}>
       <div className="wt-suggestion-title">{item.name}</div>
-      <div className="wt-suggestion-addr">{item.addr}</div>
+      <div className="wt-suggestion-addr">{item.place}</div>
       <div className="wt-suggestion-meta">{item.days} {s.days} · {item.km} {s.km}</div>
     </button>
   )
 }
 
-function BuildModal({ onClose }) {
+function buildBrief(f, lang) {
+  const or = v => (v && String(v).trim()) || (lang === 'he' ? '(נא להציע)' : '(please suggest)')
+  const ints = [...f.interests]
+  return `# Trip brief: ${or(f.destination)}
+
+- **Dates:** ${or(f.startDate)} → ${or(f.endDate)}
+- **Origin airport:** ${or(f.origin)}
+- **Travellers:** ${f.travellers} people, ${f.rooms} room(s)
+- **Pace:** ${f.pace}
+- **Interests:** ${ints.length ? ints.join(', ') : '(open)'}
+
+## Already booked / provided
+${f.bookings.trim() || '(none — please search & suggest flights, car, hotels)'}
+
+<!-- Generated by the Travel App build wizard. Feed this to the /new-trip agent. -->
+`
+}
+
+function BuildWizard({ initialDestination, onClose }) {
   const { lang } = useLang()
-  const w = welcomeTranslations[lang]
+  const s = strings[lang]
+  const [step, setStep] = useState(1)
+  const [closing, setClosing] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const modalRef = useRef(null)
+  const [form, setForm] = useState({
+    destination: initialDestination || '', origin: '', startDate: '', endDate: '',
+    travellers: 2, rooms: 1, pace: 'balanced', interests: new Set(), bookings: '',
+  })
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const TOTAL = 4
+
+  function close() {
+    setClosing(true)
+    setTimeout(onClose, 170)
+  }
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') close() }
+    document.addEventListener('keydown', onKey)
+    modalRef.current?.focus()
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
+  function toggleInterest(key) {
+    setForm(f => {
+      const n = new Set(f.interests)
+      if (n.has(key)) n.delete(key); else n.add(key)
+      return { ...f, interests: n }
+    })
+  }
+
+  const brief = buildBrief(form, lang)
+  function copy() {
+    navigator.clipboard?.writeText(brief).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 1500)
+    })
+  }
+  function download() {
+    const blob = new Blob([brief], { type: 'text/markdown' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'trip-brief.md'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
   return (
-    <div className="wt-modal-backdrop" onClick={onClose}>
-      <div className="wt-modal" onClick={e => e.stopPropagation()}>
-        <button className="wt-modal-x" onClick={onClose} aria-label="Close">×</button>
-        <h2 className="wt-modal-title">{w.modalTitle}</h2>
-        <p className="wt-modal-intro">{w.modalIntro}</p>
-        <ul className="wt-modal-list">
-          {w.modalItems.map((item, i) => (
-            <li key={i} className="wt-modal-item">
-              <span className="wt-modal-emoji">{item.emoji}</span>
-              <div>
-                <div className="wt-modal-item-label">{item.label}</div>
-                <div className="wt-modal-item-desc">{item.desc}</div>
+    <div className={`wt-modal-backdrop ${closing ? 'closing' : ''}`} onClick={close}>
+      <div
+        className={`wt-modal wiz ${closing ? 'closing' : ''}`}
+        onClick={e => e.stopPropagation()}
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={s.buildTitle}
+      >
+        <button className="wt-modal-x" onClick={close} aria-label={s.close}>×</button>
+        <div className="wiz-head">
+          <h2 className="wt-modal-title">{s.buildTitle}</h2>
+          <div className="wiz-progress">
+            {[1, 2, 3, 4].map(n => <span key={n} className={`wiz-dot ${n <= step ? 'on' : ''}`} />)}
+          </div>
+          <div className="wiz-stepno">{s.step} {step} / {TOTAL}</div>
+        </div>
+
+        <div className="wiz-body">
+          {step === 1 && (
+            <div className="wiz-fields">
+              <label className="wiz-field">
+                <span>{s.destination}</span>
+                <input value={form.destination} onChange={e => set('destination', e.target.value)} placeholder="Transylvania, Romania" autoFocus />
+              </label>
+              <label className="wiz-field">
+                <span>{s.origin}</span>
+                <input value={form.origin} onChange={e => set('origin', e.target.value)} placeholder="TLV" />
+              </label>
+              <div className="wiz-row">
+                <label className="wiz-field">
+                  <span>{s.start}</span>
+                  <input type="date" value={form.startDate} onChange={e => set('startDate', e.target.value)} />
+                </label>
+                <label className="wiz-field">
+                  <span>{s.end}</span>
+                  <input type="date" value={form.endDate} onChange={e => set('endDate', e.target.value)} />
+                </label>
               </div>
-            </li>
-          ))}
-        </ul>
-        <button className="wt-modal-btn" onClick={onClose}>{w.modalClose}</button>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="wiz-fields">
+              <div className="wiz-row">
+                <label className="wiz-field">
+                  <span>{s.travellers}</span>
+                  <input type="number" min="1" value={form.travellers} onChange={e => set('travellers', +e.target.value)} />
+                </label>
+                <label className="wiz-field">
+                  <span>{s.rooms}</span>
+                  <input type="number" min="1" value={form.rooms} onChange={e => set('rooms', +e.target.value)} />
+                </label>
+              </div>
+              <div className="wiz-field">
+                <span>{s.pace}</span>
+                <div className="wiz-seg">
+                  {['relaxed', 'balanced', 'packed'].map(p => (
+                    <button key={p} className={form.pace === p ? 'on' : ''} onClick={() => set('pace', p)}>{s[p]}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="wiz-field">
+                <span>{s.interests}</span>
+                <div className="wiz-chips">
+                  {INTERESTS.map(i => (
+                    <button
+                      key={i.key}
+                      className={`wiz-chip ${form.interests.has(i.key) ? 'on' : ''}`}
+                      onClick={() => toggleInterest(i.key)}
+                      aria-pressed={form.interests.has(i.key)}
+                    >{i[lang]}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="wiz-fields">
+              <label className="wiz-field">
+                <span>{s.bookingsLabel}</span>
+                <textarea rows={7} value={form.bookings} onChange={e => set('bookings', e.target.value)} placeholder={s.bookingsPh} />
+              </label>
+              <div className="wiz-note">{s.reqNote}</div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="wiz-fields">
+              <div className="wiz-field">
+                <span>{s.review}</span>
+                <pre className="wiz-brief">{brief}</pre>
+              </div>
+              <div className="wiz-note">{s.briefHint}</div>
+            </div>
+          )}
+        </div>
+
+        <div className="wiz-foot">
+          {step > 1
+            ? <button className="wiz-btn ghost" onClick={() => setStep(step - 1)}>{s.back}</button>
+            : <span />}
+          {step < TOTAL
+            ? <button className="wiz-btn" onClick={() => setStep(step + 1)}>{s.next}</button>
+            : (
+              <div className="wiz-actions">
+                <button className="wiz-btn ghost" onClick={download}>{s.download}</button>
+                <button className="wiz-btn" onClick={copy}>{copied ? s.copied : s.copyBrief}</button>
+              </div>
+            )}
+        </div>
       </div>
     </div>
   )
 }
 
 export default function Welcome() {
-  const [showModal, setShowModal] = useState(false)
+  const [wizard, setWizard] = useState(null) // null | { destination }
+  const [query, setQuery] = useState('')
   const navigate = useNavigate()
   const { lang, setLang } = useLang()
   const s = strings[lang]
-  const w = welcomeTranslations[lang]
   const upcoming = trips[0]
+
+  const q = query.trim().toLowerCase()
+  const matchTrip = trip => {
+    if (!q) return true
+    const m = trip[lang]
+    return [m.title, m.subtitle, m.dates].some(x => x && x.toLowerCase().includes(q))
+  }
+  const matchIdea = item => !q || [item.name, item.place].some(x => x.toLowerCase().includes(q))
+  const showUpcoming = upcoming && matchTrip(upcoming)
+  const filteredIdeas = suggestions.filter(matchIdea)
+  const noResults = q && !showUpcoming && filteredIdeas.length === 0
 
   return (
     <div className="welcome">
@@ -108,11 +300,8 @@ export default function Welcome() {
         <div className="wt-blob wt-blob-core" />
 
         <div className="wt-hero-top">
-          <button
-            className="wt-lang"
-            onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
-            title={lang === 'en' ? 'Switch to Hebrew' : 'Switch to English'}
-          >
+          <button className="wt-lang" onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
+            title={lang === 'en' ? 'Switch to Hebrew' : 'Switch to English'}>
             {lang === 'en' ? 'עב' : 'EN'}
           </button>
         </div>
@@ -121,28 +310,36 @@ export default function Welcome() {
 
         <div className="wt-search">
           <span className="wt-search-ico">🔍</span>
-          <input type="text" placeholder={s.search} aria-label={s.search} />
+          <input type="text" placeholder={s.search} aria-label={s.search}
+            value={query} onChange={e => setQuery(e.target.value)} />
+          {query && <button className="wt-search-clear" onClick={() => setQuery('')} aria-label="Clear search">×</button>}
         </div>
       </header>
 
       <div className="wt-content">
-        {upcoming && <TripCard trip={upcoming} onClick={() => navigate(upcoming.route)} />}
+        {showUpcoming && <TripCard trip={upcoming} onClick={() => navigate(upcoming.route)} />}
 
-        <button className="wt-build" onClick={() => setShowModal(true)}>
-          <div className="wt-build-plus">+</div>
-          <div className="wt-build-title">{w.buildTitle}</div>
-          <div className="wt-build-sub">{s.buildSub}</div>
-        </button>
+        {!q && (
+          <button className="wt-build" onClick={() => setWizard({ destination: '' })}>
+            <div className="wt-build-plus">+</div>
+            <div className="wt-build-title">{s.buildTitle}</div>
+            <div className="wt-build-sub">{s.buildSub}</div>
+          </button>
+        )}
 
-        <div className="wt-ideas">
-          <div className="wt-ideas-label">{s.newIdeas}</div>
-          {suggestions.map((item, i) => (
-            <Suggestion key={i} item={item} onClick={() => setShowModal(true)} />
-          ))}
-        </div>
+        {filteredIdeas.length > 0 && (
+          <div className="wt-ideas">
+            <div className="wt-ideas-label">{s.newIdeas}</div>
+            {filteredIdeas.map((item, i) => (
+              <Suggestion key={i} item={item} onClick={() => setWizard({ destination: `${item.name}, ${item.place}` })} />
+            ))}
+          </div>
+        )}
+
+        {noResults && <div className="wt-noresults">{s.noResults}</div>}
       </div>
 
-      {showModal && <BuildModal onClose={() => setShowModal(false)} />}
+      {wizard && <BuildWizard initialDestination={wizard.destination} onClose={() => setWizard(null)} />}
     </div>
   )
 }

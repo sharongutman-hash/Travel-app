@@ -318,14 +318,18 @@ export const HOTELS = {
 };
 
 export const trip = {
+  slug: "romania",
   title: "Romania Road Trip",
+  country: "Romania",
+  flag: "🇷🇴",
+  startDate: "2026-08-06",
   subtitle: "10 days through Transylvania",
   heroImage: "https://images.unsplash.com/photo-1601244005535-a48d21d951ac?w=1200&q=80",
   dates: "Aug 6 – 16, 2026",
   totalKm: 638,
   flight: {
-    outbound: { number: "LY573",  from: "TLV", to: "BUH", date: "Thu, Aug 6",  departs: "04:45", arrives: "07:25", bookingRef: "7IGKV6" },
-    return:   { number: "LY9492", from: "BUH", to: "TLV", date: "Sun, Aug 16", departs: "20:45", arrives: "23:20", bookingRef: "7ILXY6" },
+    outbound: { number: "LY573",  airline: "EL AL", from: "TLV", to: "BUH", date: "Thu, Aug 6",  departs: "04:45", arrives: "07:25", bookingRef: "7IGKV6" },
+    return:   { number: "LY9492", airline: "EL AL", from: "BUH", to: "TLV", date: "Sun, Aug 16", departs: "20:45", arrives: "23:20", bookingRef: "7ILXY6" },
   },
   car: {
     pickup: { location: "Bucharest Otopeni Airport (OTP)", time: "11:00 AM", date: "Thu, Aug 6" },

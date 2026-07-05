@@ -9,7 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist --repo https://github.com/sharongutman-hash/Travel-app.git"
+    "deploy": "gh-pages -d dist --repo https://github.com/sharongutman-hash/Travel-app.git",
+    "validate": "node scripts/validate-trip.mjs",
+    "prebuild": "npm run validate"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
