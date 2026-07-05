@@ -1,14 +1,15 @@
 import { trip } from './tripData'
 import { tripTranslations } from './i18n'
 
-// Registry of trips shown on the welcome page. Each trip is a standalone
-// itinerary; for now the only ready trip is the Romania road trip, whose
-// details live in tripData.js. New trips get added here as they're built.
+// Registry of trips shown on the welcome page. A standalone trip app derives its
+// single entry from tripData.js — set `trip.slug` and `trip.flag` there and this
+// updates automatically (no hand-editing per trip). A multi-trip hub would push
+// additional entries here (or read a trips.json manifest).
 export const trips = [
   {
-    id: 'romania',
-    route: '/trip/romania',
-    flag: '🇷🇴',
+    id: trip.slug,
+    route: `/trip/${trip.slug}`,
+    flag: trip.flag,
     heroImage: trip.heroImage,
     days: trip.days.length,
     km: trip.totalKm,
@@ -25,3 +26,9 @@ export const trips = [
     },
   },
 ]
+
+// Resolve a registry entry by its route id. Returns null for unknown ids so
+// callers can redirect/404 instead of silently rendering the wrong trip.
+export function getTrip(tripId) {
+  return trips.find(t => t.id === tripId) || null
+}

@@ -1,7 +1,20 @@
 import { useState, useEffect } from 'react'
 
-// In-memory cache so we never re-fetch the same leg
-const cache = {}
+// Route geometries never change for a fixed trip, so persist them in
+// localStorage (keyed by coord pair). Falls back to a plain object if storage
+// is unavailable (private mode, quota, SSR).
+const LS_KEY = 'trip.routeCache.v1'
+function loadCache() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || {} } catch { return {} }
+}
+const cache = loadCache()
+let saveTimer = null
+function persist() {
+  clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(cache)) } catch { /* ignore */ }
+  }, 300)
+}
 
 // OSRM public demo server — free, no API key, real road routing
 const OSRM = 'https://router.project-osrm.org/route/v1/driving'
@@ -46,6 +59,7 @@ export function useRoute(from, to) {
     fetchRoute(from, to)
       .then(result => {
         cache[key] = result
+        persist()
         setState({ ...result, loading: false })
       })
       .catch(() => {
@@ -71,7 +85,7 @@ export function useMultiRoute(legs) {
       legs.map(([from, to]) => {
         const k = `${from[0]},${from[1]}|${to[0]},${to[1]}`
         if (cache[k]) return Promise.resolve(cache[k])
-        return fetchRoute(from, to).then(r => { cache[k] = r; return r }).catch(() => ({ coords: [from, to] }))
+        return fetchRoute(from, to).then(r => { cache[k] = r; persist(); return r }).catch(() => ({ coords: [from, to] }))
       })
     ).then(results => {
       setRoutes(results.map(r => r.coords))
@@ -111,7 +125,7 @@ export function useHotelDistances(origin, targets) {
         const k = `${origin[0]},${origin[1]}|${t.coords[0]},${t.coords[1]}`
         const p = cache[k]
           ? Promise.resolve(cache[k])
-          : fetchRoute(origin, t.coords).then(r => { cache[k] = r; return r }).catch(() => null)
+          : fetchRoute(origin, t.coords).then(r => { cache[k] = r; persist(); return r }).catch(() => null)
         return p.then(r => [t.id, r])
       })
     ).then(results => {

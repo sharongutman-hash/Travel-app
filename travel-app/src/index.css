@@ -122,3 +122,91 @@ a { text-decoration: none; color: inherit; }
 [dir="rtl"] .res-contacts {
   justify-content: flex-end;
 }
+
+/* ── Map wrapper + controls (shared) ───────────────────── */
+.map-wrap { position: relative; height: 100%; width: 100%; }
+.map-wrap .leaflet-container { height: 100%; width: 100%; }
+.map-wrap:fullscreen { border-radius: 0; }
+
+.map-topleft {
+  position: absolute; top: 10px; left: 10px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.map-ctrl-btn {
+  width: 34px; height: 34px; border: none; border-radius: 9px;
+  background: #fff; color: #111; font-size: 16px; line-height: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  display: flex; align-items: center; justify-content: center;
+}
+.map-ctrl-btn:hover { background: #f3f4f6; }
+
+.map-layers { position: relative; }
+.map-layers-menu {
+  position: absolute; top: 0; left: 40px;
+  background: #fff; border-radius: 10px; padding: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  display: flex; flex-direction: column; gap: 2px; min-width: 128px;
+}
+.map-layer-opt {
+  display: flex; align-items: center; gap: 8px;
+  border: none; background: transparent; border-radius: 7px;
+  padding: 7px 10px; font-size: 13px; color: #374151;
+  text-align: left; white-space: nowrap;
+}
+.map-layer-opt:hover { background: #f3f4f6; }
+.map-layer-opt.active { background: #EBF2FF; color: #1469F5; font-weight: 600; }
+
+.map-filters {
+  position: absolute; top: 10px; right: 10px; z-index: 1000;
+  display: flex; flex-wrap: wrap; gap: 5px; max-width: 62%; justify-content: flex-end;
+}
+.map-filter-chip {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--chip); background: var(--chip); color: #fff;
+  font-size: 14px; box-shadow: 0 1px 5px rgba(0,0,0,.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .15s, filter .15s;
+}
+.map-filter-chip.off { background: #fff; filter: grayscale(1); opacity: .55; }
+
+[dir="rtl"] .map-topleft { left: auto; right: 10px; }
+[dir="rtl"] .map-layers-menu { left: auto; right: 40px; }
+[dir="rtl"] .map-filters { right: auto; left: 10px; justify-content: flex-start; }
+
+/* Popup content */
+.popup-thumb { width: 180px; max-width: 100%; height: 96px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 6px; }
+.popup-details {
+  margin-top: 6px; border: none; background: #1469F5; color: #fff;
+  font-size: 12px; font-weight: 600; border-radius: 8px; padding: 5px 10px;
+}
+
+/* ── Page transition (§2.1) ────────────────────────────── */
+.route-fade { animation: routefade .28s ease; }
+@keyframes routefade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Error boundary fallback (§4) ──────────────────────── */
+.error-boundary {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  gap: 10px; padding: 40px 24px; color: #374151;
+}
+.error-boundary .error-emoji { font-size: 40px; }
+.error-boundary h1 { font-size: 20px; }
+.error-boundary p { font-size: 13px; color: #9ca3af; max-width: 340px; }
+.error-boundary a {
+  margin-top: 8px; background: #1469F5; color: #fff;
+  padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px;
+}
+
+/* ── Respect reduced-motion (§2.5) ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

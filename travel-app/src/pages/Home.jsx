@@ -1,21 +1,22 @@
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useParams, Navigate } from 'react-router-dom'
 import { trip, STOPS, HOTELS } from '../tripData'
+import { getTrip } from '../trips'
 import { useLang } from '../LangContext'
 import { tripTranslations } from '../i18n'
 import RouteMap from '../components/RouteMap'
 import './Home.css'
 
 const strings = {
-  en: { upcoming: 'Upcoming', today: 'Today', depart: 'Depart', bookingId: 'Booking ID', direct: 'Direct', daysTrip: 'Days Trip', viewList: 'View List', viewDay: 'View day', stay: 'Stay', daysWord: 'days trip', dayOf: 'Day {n} of {t}' },
-  he: { upcoming: 'הקרוב', today: 'היום', depart: 'יציאה', bookingId: 'מספר הזמנה', direct: 'ישיר', daysTrip: 'ימי הטיול', viewList: 'הצג רשימה', viewDay: 'צפה ביום', stay: 'שהייה', daysWord: 'ימי טיול', dayOf: 'יום {n} מתוך {t}' },
+  en: { upcoming: 'Upcoming', today: 'Today', depart: 'Depart', bookingId: 'Booking ID', direct: 'Direct', daysTrip: 'Days Trip', viewList: 'View List', viewCards: 'View Cards', viewDay: 'View day', stay: 'Stay', daysWord: 'days trip', dayOf: 'Day {n} of {t}', completed: 'Completed', tripRecap: 'Trip recap', viewTrip: 'View trip' },
+  he: { upcoming: 'הקרוב', today: 'היום', depart: 'יציאה', bookingId: 'מספר הזמנה', direct: 'ישיר', daysTrip: 'ימי הטיול', viewList: 'הצג רשימה', viewCards: 'הצג כרטיסים', viewDay: 'צפה ביום', stay: 'שהייה', daysWord: 'ימי טיול', dayOf: 'יום {n} מתוך {t}', completed: 'הסתיים', tripRecap: 'סיכום הטיול', viewTrip: 'צפה בטיול' },
 }
 
-// The trip runs Aug 6–16, 2026; day N maps to Aug (5 + N).
-const TRIP_YEAR = 2026
-const TRIP_MONTH = 7 // August (0-indexed)
-const TRIP_START_DAY = 6
+// Day N maps to trip.startDate + (N-1) days. startDate is an ISO "YYYY-MM-DD";
+// parse its parts so the Date is built in local time (avoids UTC day-shift).
 function dateForDay(day) {
-  return new Date(TRIP_YEAR, TRIP_MONTH, TRIP_START_DAY + (day.id - 1))
+  const [y, m, d] = trip.startDate.split('-').map(Number)
+  return new Date(y, m - 1, d + (day.id - 1))
 }
 
 // Duration between two "HH:MM" times, e.g. 04:45 → 07:25 = "2h 40m".
@@ -56,7 +57,7 @@ function FlightGlance({ f, s, onClick }) {
           <div className="g-time">{f.arrives}</div>
         </div>
       </div>
-      <div className="glance-info">{f.number} · EL AL · {s.direct}</div>
+      <div className="glance-info">{f.number}{f.airline ? ` · ${f.airline}` : ''} · {s.direct}</div>
       <div className="glance-divider" />
       <div className="glance-foot">
         <span>{s.bookingId}</span>
@@ -109,6 +110,25 @@ function CurrentDayGlance({ day, total, s, onClick }) {
   )
 }
 
+// Compact full-width row used by the vertical agenda ("View List") mode.
+function AgendaRow({ day, s, onClick }) {
+  const stop = STOPS.find(st => st.id === day.stopId)
+  const title = day.type === 'travel' ? `${day.from} → ${day.to}` : (stop?.shortName || day.location)
+  const meta = day.type === 'travel' && day.drive
+    ? `${day.date} · ${day.drive.distance}`
+    : `${day.date} · ${s.stay}`
+  return (
+    <button className="agenda-row" onClick={onClick}>
+      <span className="agenda-daynum">{day.id}</span>
+      <div className="agenda-body">
+        <div className="agenda-title">{title}</div>
+        <div className="agenda-meta">{meta}</div>
+      </div>
+      <span className="agenda-caret">›</span>
+    </button>
+  )
+}
+
 function DayCard({ day, s, onClick }) {
   const stop = STOPS.find(st => st.id === day.stopId)
   const title = day.type === 'travel' ? `${day.from} → ${day.to}` : (stop?.shortName || day.location)
@@ -128,22 +148,53 @@ function DayCard({ day, s, onClick }) {
   )
 }
 
+// Shown once the trip is over: a recap entry point instead of a stale "upcoming".
+function FinishedGlance({ s, total, onClick }) {
+  return (
+    <button className="glance" onClick={onClick}>
+      <div className="glance-top">
+        <span className="glance-badge glance-badge-done">{s.completed}</span>
+        <span className="glance-date">{trip.dates}</span>
+      </div>
+      <div className="glance-stay">
+        <div className="glance-stay-title">🎉 {s.tripRecap}</div>
+        <div className="glance-stay-sub">{total} {s.daysWord}</div>
+      </div>
+      <div className="glance-divider" />
+      <div className="glance-foot">
+        <span>{s.viewTrip}</span>
+        <span className="glance-ref">›</span>
+      </div>
+    </button>
+  )
+}
+
 export default function Home() {
   const navigate = useNavigate()
+  const { tripId } = useParams()
   const { lang } = useLang()
   const s = strings[lang]
   const tripT = tripTranslations[lang]
   const f = trip.flight.outbound
+  const entry = getTrip(tripId)
+  const [listView, setListView] = useState(false)
 
   function goToDay(day) {
-    navigate(`/day/${day.id}`)
+    navigate(`/trip/${tripId}/day/${day.id}`)
   }
 
   // Once the trip has started, the coming card shows today's day; before that
   // it shows the upcoming outbound flight.
   const now = new Date()
   const todayKey = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-  const currentDay = trip.days.find(d => dateForDay(d).getTime() === todayKey)
+  const currentDay = trip.startDate
+    ? trip.days.find(d => dateForDay(d).getTime() === todayKey)
+    : null
+  const lastDay = trip.days[trip.days.length - 1]
+  const tripEnded = trip.startDate && !currentDay && dateForDay(lastDay).getTime() < todayKey
+
+  // Unknown trip id → back to the welcome hub rather than rendering the wrong trip.
+  if (!entry) return <Navigate to="/" replace />
 
   return (
     <div className="home">
@@ -159,7 +210,9 @@ export default function Home() {
       <div className="trip-stage">
         {currentDay
           ? <CurrentDayGlance day={currentDay} total={trip.days.length} s={s} onClick={() => goToDay(currentDay)} />
-          : <FlightGlance f={f} s={s} onClick={() => goToDay(trip.days[0])} />}
+          : tripEnded
+            ? <FinishedGlance s={s} total={trip.days.length} onClick={() => goToDay(trip.days[0])} />
+            : <FlightGlance f={f} s={s} onClick={() => goToDay(trip.days[0])} />}
 
         <div className="trip-map">
           <RouteMap onStopClick={(stopId) => {
@@ -172,13 +225,23 @@ export default function Home() {
       <div className="days-sec">
         <div className="days-head">
           <h2>{s.daysTrip}</h2>
-          <button className="days-viewlist" onClick={() => goToDay(trip.days[0])}>{s.viewList}</button>
+          <button className="days-viewlist" onClick={() => setListView(v => !v)}>
+            {listView ? s.viewCards : s.viewList}
+          </button>
         </div>
-        <div className="days-scroll">
-          {trip.days.map(day => (
-            <DayCard key={day.id} day={day} s={s} onClick={() => goToDay(day)} />
-          ))}
-        </div>
+        {listView ? (
+          <div className="days-list">
+            {trip.days.map(day => (
+              <AgendaRow key={day.id} day={day} s={s} onClick={() => goToDay(day)} />
+            ))}
+          </div>
+        ) : (
+          <div className="days-scroll">
+            {trip.days.map(day => (
+              <DayCard key={day.id} day={day} s={s} onClick={() => goToDay(day)} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

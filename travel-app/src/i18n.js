@@ -1,3 +1,11 @@
+// Resolve a possibly-bilingual field: a `{ en, he }` object returns the current
+// language (falling back to en); a plain string is returned as-is. Lets trip
+// content (spot name/note/desc, day.summary, …) be localized or not, per field.
+export function pick(v, lang) {
+  if (v && typeof v === 'object' && !Array.isArray(v)) return v[lang] ?? v.en ?? ''
+  return v
+}
+
 export const translations = {
   en: {
     days: 'days',
@@ -28,6 +36,8 @@ export const translations = {
     returnBy: 'Return by',
     flightLabel: 'Flight',
     elal: 'EL AL',
+    lands: 'lands',
+    departs: 'departs',
     bookingRef: 'Booking ref:',
     dayNotFound: 'Day not found',
     fromHotel: 'from hotel',
@@ -67,6 +77,8 @@ export const translations = {
     returnBy: 'החזרה עד',
     flightLabel: 'טיסה',
     elal: 'אל על',
+    lands: 'נוחתת',
+    departs: 'ממריאה',
     bookingRef: 'מספר הזמנה:',
     dayNotFound: 'היום לא נמצא',
     fromHotel: 'מהמלון',

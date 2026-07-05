@@ -44,18 +44,25 @@
   display: flex;
   flex-direction: column;
   height: 48vh;
-  min-height: 300px;
+  min-height: 0;
   flex-shrink: 0;
+  transition: height .25s ease;
 }
+.bottom-sheet.dragging { transition: none; }
+
+/* Enlarged, draggable hit area around the grab handle */
+.sheet-handle-hit { padding: 8px 0 4px; flex-shrink: 0; cursor: grab; touch-action: none; }
+.sheet-handle-hit:active { cursor: grabbing; }
 
 .sheet-handle {
   width: 40px; height: 4px;
   background: #e5e7eb; border-radius: 2px;
-  margin: 10px auto 0; flex-shrink: 0;
+  margin: 0 auto; flex-shrink: 0;
 }
 
 .tab-bar {
   display: flex;
+  position: relative;
   padding: 8px 16px 0;
   border-bottom: 1px solid #f3f4f6;
   flex-shrink: 0;
@@ -68,7 +75,12 @@
   cursor: pointer; transition: all .15s;
   white-space: nowrap;
 }
-.tab-btn.active { color: #1469F5; border-bottom-color: #1469F5; }
+.tab-btn.active { color: #1469F5; }
+.tab-indicator {
+  position: absolute; bottom: 0; left: 0; height: 2.5px;
+  background: #1469F5; border-radius: 2px;
+  transition: transform .25s ease; pointer-events: none;
+}
 
 .sheet-scroll {
   flex: 1;
@@ -103,15 +115,17 @@
 .spot-row {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; cursor: pointer;
+  width: 100%; background: transparent; border: none;
+  font-family: inherit; text-align: inherit;
 }
 .spot-dot {
   width: 32px; height: 32px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 15px; flex-shrink: 0; color: #fff;
 }
-.spot-info { flex: 1; min-width: 0; }
-.spot-name { font-size: 14px; font-weight: 500; color: #111; }
-.spot-note { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+.spot-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.spot-name { font-size: 14px; font-weight: 500; color: #111; display: block; }
+.spot-note { font-size: 12px; color: #9ca3af; margin-top: 1px; display: block; }
 
 .spot-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .spot-chip {
@@ -237,3 +251,14 @@
 @media (min-width: 1200px) {
   .bottom-sheet { width: 460px; }
 }
+
+
+/* ── Interaction polish (animations) ───────────────────── */
+.tab-fade { animation: tabfade .22s ease; }
+@keyframes tabfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.spot-detail { animation: spotexpand .2s ease; }
+@keyframes spotexpand { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.spot-chip.loading { animation: chippulse 1.1s ease-in-out infinite; }
+@keyframes chippulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
