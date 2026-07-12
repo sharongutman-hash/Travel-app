@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
-import { useParams, useNavigate, Navigate } from 'react-router-dom'
-import { trip, STOPS, SPOTS, CATEGORIES, CATEGORY_IMAGES, HOTELS } from '../tripData'
-import { getTrip } from '../trips'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useTrip } from '../TripContext'
 import { useHotelDistances } from '../hooks/useRoute'
 import { useLang } from '../LangContext'
-import { translations, categoryTranslations, daySummaries, pick } from '../i18n'
+import { translations, categoryTranslations, pick } from '../i18n'
 import DayMap from '../components/DayMap'
 import { CategoryFilter } from '../components/MapControls'
 import './DayDetail.css'
@@ -30,7 +29,7 @@ function useIsMobile() {
 
 function TabSummary({ day }) {
   const { lang } = useLang()
-  const summary = daySummaries[lang][day.id] || day.summary
+  const summary = pick(day.summary, lang)
   return (
     <div className="tab-content">
       <div className="summary-text">{summary}</div>
@@ -48,6 +47,7 @@ function TabSummary({ day }) {
 }
 
 function TabAttractions({ day, selectedSpotId, onSpotSelect, activeCats }) {
+  const { trip, STOPS, SPOTS, HOTELS, CATEGORIES, CATEGORY_IMAGES } = useTrip()
   const { lang } = useLang()
   const t = translations[lang]
   const catT = categoryTranslations[lang]
@@ -82,7 +82,7 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect, activeCats }) {
         const cat = CATEGORIES[catKey]
         return (
           <div key={catKey} className="cat-section">
-            <div className="cat-heading" style={{ color: cat.color }}>{cat.emoji} {catT[catKey]}</div>
+            <div className="cat-heading" style={{ color: cat.color }}>{cat.emoji} {catT[catKey] ?? cat.label}</div>
             {catSpots.map(spot => {
               const selected = selectedSpotId === spot.id
               const d = distances[spot.id]
@@ -162,6 +162,7 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect, activeCats }) {
 }
 
 function TabAdmin({ day }) {
+  const { trip, HOTELS } = useTrip()
   const { lang } = useLang()
   const t = translations[lang]
   const hotel = day.hotelId ? HOTELS[day.hotelId] : null
@@ -254,9 +255,9 @@ function nearestSnap(v) { return SNAPS.reduce((a, b) => Math.abs(b - v) < Math.a
 export default function DayDetail() {
   const { tripId, dayId } = useParams()
   const navigate = useNavigate()
+  const { trip, STOPS, SPOTS, CATEGORIES } = useTrip()
   const { lang } = useLang()
   const t = translations[lang]
-  const entry = getTrip(tripId)
   const day = trip.days.find(d => d.id === parseInt(dayId))
   const [activeTab, setActiveTab] = useState('summary')
   const [selectedSpot, setSelectedSpot] = useState(null)
@@ -272,8 +273,6 @@ export default function DayDetail() {
   useLayoutEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollMem.current[activeTab] || 0
   }, [activeTab])
-
-  if (!entry) return <Navigate to="/" replace />
 
   const TABS = [
     { id: 'summary',     label: t.tabSummary },

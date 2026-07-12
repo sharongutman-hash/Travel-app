@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '../leafletSetup'
-import { STOPS, SPOTS, CATEGORIES, trip } from '../tripData'
+import { useTrip } from '../TripContext'
 import { useRoute } from '../hooks/useRoute'
 import { useLang } from '../LangContext'
 import { pick } from '../i18n'
@@ -36,11 +36,11 @@ function FitBounds({ coords }) {
 }
 
 // Pan/zoom to the selected spot when it changes (§2.4 list → map sync).
-function FlyToSpot({ spotId }) {
+function FlyToSpot({ spotId, spots }) {
   const map = useMap()
   useEffect(() => {
     if (!spotId) return
-    const spot = SPOTS.find(s => s.id === spotId)
+    const spot = spots.find(s => s.id === spotId)
     if (spot) map.flyTo(spot.coords, Math.max(map.getZoom(), 13), { duration: 0.6 })
   }, [spotId])
   return null
@@ -72,6 +72,7 @@ function RouteLayer({ from, to, loading }) {
 }
 
 export default function DayMap({ day, selectedSpotId, onSpotClick, activeCats = new Set() }) {
+  const { trip, STOPS, SPOTS, CATEGORIES } = useTrip()
   const { lang } = useLang()
   const [layerId, setLayerId] = useState(DEFAULT_LAYER)
   const [map, setMap] = useState(null)
@@ -110,7 +111,7 @@ export default function DayMap({ day, selectedSpotId, onSpotClick, activeCats = 
       >
         <TileLayer key={layer.id} attribution={layer.attribution} url={layer.url} />
         {allCoords.length > 1 && <FitBounds coords={allCoords} />}
-        <FlyToSpot spotId={selectedSpotId} />
+        <FlyToSpot spotId={selectedSpotId} spots={allSpots} />
 
         {day.type === 'travel' && fromStop && stop && (
           <RouteLayer from={fromStop.coords} to={stop.coords} />
