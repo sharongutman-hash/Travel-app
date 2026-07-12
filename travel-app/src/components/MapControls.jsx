@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import L from 'leaflet'
 import { BASE_LAYERS } from '../mapLayers'
-import { CATEGORIES } from '../tripData'
+import { useTrip } from '../TripContext'
 
 // Pill button that expands into a base-layer menu. Controlled by the map.
 export function LayerSwitcher({ value, onChange }) {
@@ -31,6 +31,7 @@ export function LayerSwitcher({ value, onChange }) {
 
 // Category filter chips. `active` is a Set of category keys (empty = show all).
 export function CategoryFilter({ cats, active, onToggle }) {
+  const { CATEGORIES } = useTrip()
   if (cats.length < 2) return null
   return (
     <div className="map-filters">
