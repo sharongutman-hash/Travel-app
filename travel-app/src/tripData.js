@@ -24,13 +24,13 @@ export const STOPS = [
     id: "otp",
     name: "Bucharest Airport (OTP)", shortName: "Bucharest",
     coords: [44.572, 26.102],
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bucharest_University_Square_%28cropped%29.jpg/960px-Bucharest_University_Square_%28cropped%29.jpg",
   },
   {
     id: "snagov",
     name: "Snagov", shortName: "Snagov",
     coords: [44.7095, 26.1530],   // Hotel Snagov Club coords
-    image: "https://images.unsplash.com/photo-1566274360960-0b67d9498c04?w=600&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/M%C3%A2n%C4%83stirea_Snagov.jpg/960px-M%C3%A2n%C4%83stirea_Snagov.jpg",
     region: "Ilfov County, Muntenia",
     about: "Snagov is a scenic commune built around Lake Snagov, the largest natural lake in Romania (600 ha, 16 km long). Famous as the legendary burial site of Vlad the Impaler (Dracula).",
     wikipedia: "https://en.wikipedia.org/wiki/Snagov",
@@ -39,7 +39,7 @@ export const STOPS = [
     id: "sinaia",
     name: "Sinaia", shortName: "Sinaia",
     coords: [45.3535, 25.5520],   // Hotel Sinaia coords
-    image: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=600&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/01_Chateau_Peles.jpg/960px-01_Chateau_Peles.jpg",
     region: "Prahova County, Muntenia",
     about: "Known as the 'Pearl of the Carpathians,' Sinaia is a royal mountain resort town nestled in the Bucegi Mountains. King Carol I built his summer residence Peleș Castle here.",
     wikipedia: "https://en.wikipedia.org/wiki/Sinaia",
@@ -48,7 +48,7 @@ export const STOPS = [
     id: "brasov",
     name: "Brașov", shortName: "Brașov",
     coords: [45.6450, 25.5940],   // The Pines Boutique Villa coords
-    image: "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=600&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Bra%C8%99ov%2C_Pia%C8%9Ba_Sfatului_-_Flickr_-_Jorge_Franganillo.jpg/960px-Bra%C8%99ov%2C_Pia%C8%9Ba_Sfatului_-_Flickr_-_Jorge_Franganillo.jpg",
     region: "Brașov County, Transylvania",
     about: "One of Romania's most visited cities — a medieval jewel in the heart of Transylvania, surrounded by forested mountains. Known for its Gothic Black Church and proximity to Bran Castle.",
     wikipedia: "https://en.wikipedia.org/wiki/Bra%C8%99ov",
@@ -57,7 +57,7 @@ export const STOPS = [
     id: "sibiu",
     name: "Sibiu / Gura Râului", shortName: "Sibiu",
     coords: [45.6700, 23.9150],   // Pensiunea La Vâltoare coords (Gura Râului, 18 km from Sibiu)
-    image: "https://images.unsplash.com/photo-1571406252241-db0280bd36cd?w=600&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Hermannstadt_Romania%2C_the_Small_Plaza.jpg/960px-Hermannstadt_Romania%2C_the_Small_Plaza.jpg",
     region: "Sibiu County, Transylvania",
     about: "One of Romania's most beautifully preserved medieval cities (Hermannstadt). European Capital of Culture 2007. Staying in Gura Râului village, 18 km from Sibiu city center.",
     wikipedia: "https://en.wikipedia.org/wiki/Sibiu",
@@ -66,7 +66,7 @@ export const STOPS = [
     id: "curtea",
     name: "Curtea de Argeș", shortName: "Curtea de Argeș",
     coords: [45.1392, 24.6792],   // Old Court coords
-    image: "https://images.unsplash.com/photo-1601244005535-a48d21d951ac?w=600&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Man_Curtea_de_Arges.SV.jpg/960px-Man_Curtea_de_Arges.SV.jpg",
     region: "Argeș County, Muntenia",
     about: "One of the oldest towns in Wallachia and former medieval capital. The Royal Necropolis holds the tombs of Romanian kings. Gateway to the Transfăgărășan and Poienari Fortress.",
     wikipedia: "https://en.wikipedia.org/wiki/Curtea_de_Arge%C8%99",
