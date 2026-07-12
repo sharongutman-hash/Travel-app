@@ -279,18 +279,16 @@ export default function Welcome() {
   const navigate = useNavigate()
   const { lang, setLang } = useLang()
   const s = strings[lang]
-  const upcoming = trips[0]
-
-  const q = query.trim().toLowerCase()
+    const q = query.trim().toLowerCase()
   const matchTrip = trip => {
     if (!q) return true
     const m = trip[lang]
     return [m.title, m.subtitle, m.dates].some(x => x && x.toLowerCase().includes(q))
   }
   const matchIdea = item => !q || [item.name, item.place].some(x => x.toLowerCase().includes(q))
-  const showUpcoming = upcoming && matchTrip(upcoming)
+  const shownTrips = trips.filter(matchTrip)
   const filteredIdeas = suggestions.filter(matchIdea)
-  const noResults = q && !showUpcoming && filteredIdeas.length === 0
+  const noResults = q && shownTrips.length === 0 && filteredIdeas.length === 0
 
   return (
     <div className="welcome">
@@ -317,7 +315,9 @@ export default function Welcome() {
       </header>
 
       <div className="wt-content">
-        {showUpcoming && <TripCard trip={upcoming} onClick={() => navigate(upcoming.route)} />}
+        {shownTrips.map(tr => (
+          <TripCard key={tr.id} trip={tr} onClick={() => navigate(tr.route)} />
+        ))}
 
         {!q && (
           <button className="wt-build" onClick={() => setWizard({ destination: '' })}>

@@ -3,24 +3,12 @@ import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '../leafletSetup'
-import { STOPS, SPOTS, CATEGORIES, getDayRangeByStop } from '../tripData'
+import { useTrip } from '../TripContext'
 import { useMultiRoute } from '../hooks/useRoute'
 import { useLang } from '../LangContext'
 import { pick } from '../i18n'
 import { BASE_LAYERS, DEFAULT_LAYER } from '../mapLayers'
 import { LayerSwitcher, CategoryFilter, FullscreenButton } from './MapControls'
-
-// Route legs derived from stop order + a closing leg back to the first stop.
-const LEGS = STOPS.slice(0, -1).map((s, i) => [s.coords, STOPS[i + 1].coords])
-if (STOPS.length > 2) LEGS.push([STOPS[STOPS.length - 1].coords, STOPS[0].coords])
-
-const CENTER = STOPS.length
-  ? [STOPS.reduce((a, s) => a + s.coords[0], 0) / STOPS.length,
-     STOPS.reduce((a, s) => a + s.coords[1], 0) / STOPS.length]
-  : [0, 0]
-
-// Category keys actually present, in CATEGORIES order (for the filter chips).
-const PRESENT_CATS = Object.keys(CATEGORIES).filter(k => SPOTS.some(s => s.cat === k))
 
 function FitBounds({ coords }) {
   const map = useMap()
@@ -50,9 +38,20 @@ function spotIcon(color, emoji) {
 }
 
 export default function RouteMap({ onStopClick }) {
+  const { STOPS, SPOTS, CATEGORIES, getDayRangeByStop } = useTrip()
   const { lang } = useLang()
   const dayRanges = getDayRangeByStop()
-  const { routes, loading } = useMultiRoute(LEGS)
+  // Route legs derived from stop order + a closing leg back to the first stop.
+  const legs = STOPS.slice(0, -1).map((s, i) => [s.coords, STOPS[i + 1].coords])
+  if (STOPS.length > 2) legs.push([STOPS[STOPS.length - 1].coords, STOPS[0].coords])
+  const center = STOPS.length
+    ? [STOPS.reduce((a, s) => a + s.coords[0], 0) / STOPS.length,
+       STOPS.reduce((a, s) => a + s.coords[1], 0) / STOPS.length]
+    : [0, 0]
+  // Category keys actually present, in CATEGORIES order (for the filter chips).
+  const presentCats = Object.keys(CATEGORIES).filter(k => SPOTS.some(s => s.cat === k))
+
+  const { routes, loading } = useMultiRoute(legs)
   const [layerId, setLayerId] = useState(DEFAULT_LAYER)
   const [activeCats, setActiveCats] = useState(new Set())
   const [map, setMap] = useState(null)
@@ -76,9 +75,9 @@ export default function RouteMap({ onStopClick }) {
         <LayerSwitcher value={layerId} onChange={setLayerId} />
         <FullscreenButton map={map} />
       </div>
-      <CategoryFilter cats={PRESENT_CATS} active={activeCats} onToggle={toggleCat} />
+      <CategoryFilter cats={presentCats} active={activeCats} onToggle={toggleCat} />
 
-      <MapContainer ref={setMap} center={CENTER} zoom={7} style={{ height: '100%', width: '100%' }} scrollWheelZoom zoomControl={false}>
+      <MapContainer ref={setMap} center={center} zoom={7} style={{ height: '100%', width: '100%' }} scrollWheelZoom zoomControl={false}>
         <TileLayer key={layer.id} attribution={layer.attribution} url={layer.url} />
         <FitBounds coords={allCoords} />
 

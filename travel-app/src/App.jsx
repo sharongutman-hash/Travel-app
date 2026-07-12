@@ -2,6 +2,7 @@ import { Component } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { LangProvider, useLang } from './LangContext'
 import { translations } from './i18n'
+import { TripLayout } from './TripContext'
 import Welcome from './pages/Welcome'
 import Home from './pages/Home'
 import DayDetail from './pages/DayDetail'
@@ -53,8 +54,10 @@ function AnimatedRoutes() {
     <div className="route-fade" key={location.pathname}>
       <Routes location={location}>
         <Route path="/" element={<Welcome />} />
-        <Route path="/trip/:tripId" element={<Home />} />
-        <Route path="/trip/:tripId/day/:dayId" element={<DayDetail />} />
+        <Route path="/trip/:tripId" element={<TripLayout />}>
+          <Route index element={<Home />} />
+          <Route path="day/:dayId" element={<DayDetail />} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

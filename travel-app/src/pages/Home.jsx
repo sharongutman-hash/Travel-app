@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { useNavigate, useParams, Navigate } from 'react-router-dom'
-import { trip, STOPS, HOTELS } from '../tripData'
-import { getTrip } from '../trips'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useTrip } from '../TripContext'
 import { useLang } from '../LangContext'
-import { tripTranslations } from '../i18n'
+import { pick } from '../i18n'
 import RouteMap from '../components/RouteMap'
 import './Home.css'
 
@@ -14,7 +13,7 @@ const strings = {
 
 // Day N maps to trip.startDate + (N-1) days. startDate is an ISO "YYYY-MM-DD";
 // parse its parts so the Date is built in local time (avoids UTC day-shift).
-function dateForDay(day) {
+function dateForDay(trip, day) {
   const [y, m, d] = trip.startDate.split('-').map(Number)
   return new Date(y, m - 1, d + (day.id - 1))
 }
@@ -29,8 +28,8 @@ function flightDuration(dep, arr) {
 }
 
 // Resolve a day's from/to string to a short place label via the stops list.
-function shortStop(name) {
-  const st = STOPS.find(s => s.name === name || s.shortName === name)
+function shortStop(stops, name) {
+  const st = stops.find(s => s.name === name || s.shortName === name)
   return st ? st.shortName : name.split(' (')[0].split(' / ')[0]
 }
 
@@ -68,6 +67,7 @@ function FlightGlance({ f, s, onClick }) {
 }
 
 function CurrentDayGlance({ day, total, s, onClick }) {
+  const { STOPS, HOTELS } = useTrip()
   const stop = STOPS.find(st => st.id === day.stopId)
   const hotel = day.hotelId ? HOTELS[day.hotelId] : null
   const isTravel = day.type === 'travel' && day.drive
@@ -80,7 +80,7 @@ function CurrentDayGlance({ day, total, s, onClick }) {
       {isTravel ? (
         <div className="glance-route">
           <div className="g-loc">
-            <div className="g-code">{shortStop(day.from)}</div>
+            <div className="g-code">{shortStop(STOPS, day.from)}</div>
             <div className="g-time">{s.depart}</div>
           </div>
           <span className="g-ico">🚗</span>
@@ -90,7 +90,7 @@ function CurrentDayGlance({ day, total, s, onClick }) {
           </div>
           <span className="g-ico">📍</span>
           <div className="g-loc g-loc-r">
-            <div className="g-code">{shortStop(day.to)}</div>
+            <div className="g-code">{shortStop(STOPS, day.to)}</div>
             <div className="g-time">{day.drive.distance}</div>
           </div>
         </div>
@@ -112,6 +112,7 @@ function CurrentDayGlance({ day, total, s, onClick }) {
 
 // Compact full-width row used by the vertical agenda ("View List") mode.
 function AgendaRow({ day, s, onClick }) {
+  const { STOPS } = useTrip()
   const stop = STOPS.find(st => st.id === day.stopId)
   const title = day.type === 'travel' ? `${day.from} → ${day.to}` : (stop?.shortName || day.location)
   const meta = day.type === 'travel' && day.drive
@@ -130,6 +131,7 @@ function AgendaRow({ day, s, onClick }) {
 }
 
 function DayCard({ day, s, onClick }) {
+  const { STOPS } = useTrip()
   const stop = STOPS.find(st => st.id === day.stopId)
   const title = day.type === 'travel' ? `${day.from} → ${day.to}` : (stop?.shortName || day.location)
   const meta = day.type === 'travel' && day.drive
@@ -150,11 +152,13 @@ function DayCard({ day, s, onClick }) {
 
 // Shown once the trip is over: a recap entry point instead of a stale "upcoming".
 function FinishedGlance({ s, total, onClick }) {
+  const { trip } = useTrip()
+  const { lang } = useLang()
   return (
     <button className="glance" onClick={onClick}>
       <div className="glance-top">
         <span className="glance-badge glance-badge-done">{s.completed}</span>
-        <span className="glance-date">{trip.dates}</span>
+        <span className="glance-date">{pick(trip.dates, lang)}</span>
       </div>
       <div className="glance-stay">
         <div className="glance-stay-title">🎉 {s.tripRecap}</div>
@@ -172,11 +176,10 @@ function FinishedGlance({ s, total, onClick }) {
 export default function Home() {
   const navigate = useNavigate()
   const { tripId } = useParams()
+  const { trip } = useTrip()
   const { lang } = useLang()
   const s = strings[lang]
-  const tripT = tripTranslations[lang]
-  const f = trip.flight.outbound
-  const entry = getTrip(tripId)
+  const f = trip.flight?.outbound
   const [listView, setListView] = useState(false)
 
   function goToDay(day) {
@@ -188,13 +191,10 @@ export default function Home() {
   const now = new Date()
   const todayKey = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
   const currentDay = trip.startDate
-    ? trip.days.find(d => dateForDay(d).getTime() === todayKey)
+    ? trip.days.find(d => dateForDay(trip, d).getTime() === todayKey)
     : null
   const lastDay = trip.days[trip.days.length - 1]
-  const tripEnded = trip.startDate && !currentDay && dateForDay(lastDay).getTime() < todayKey
-
-  // Unknown trip id → back to the welcome hub rather than rendering the wrong trip.
-  if (!entry) return <Navigate to="/" replace />
+  const tripEnded = trip.startDate && !currentDay && dateForDay(trip, lastDay).getTime() < todayKey
 
   return (
     <div className="home">
@@ -202,7 +202,7 @@ export default function Home() {
         <div className="trip-hero-overlay" />
         <div className="trip-hero-content">
           <button className="trip-back" onClick={() => navigate('/')}>{lang === 'he' ? 'כל הטיולים ›' : '‹ All trips'}</button>
-          <h1 className="trip-title">{tripT.title.split(' ')[0]}</h1>
+          <h1 className="trip-title">{pick(trip.title, lang).split(' ')[0]}</h1>
           <span className="trip-badge">{trip.days.length} {s.daysWord}</span>
         </div>
       </div>
