@@ -108,6 +108,7 @@ export default function DayMap({ day, selectedSpotId, onSpotClick, activeCats = 
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom
         zoomControl={false}
+        gestureHandling
       >
         <TileLayer key={layer.id} attribution={layer.attribution} url={layer.url} />
         {allCoords.length > 1 && <FitBounds coords={allCoords} />}

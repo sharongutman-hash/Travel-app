@@ -1,0 +1,119 @@
+.inspire {
+  min-height: 100vh;
+  background: #f6f6f6;
+  padding-bottom: 40px;
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.inspire-hero {
+  background: linear-gradient(135deg, #00388c 0%, #0064d6 60%, #007a8c 100%);
+  color: #fff;
+  /* 44px clears the fixed .top-bar */
+  padding: 56px 20px 22px;
+}
+.inspire-hero h1 { font-size: 26px; font-weight: 700; margin-top: 4px; }
+.inspire-hero p { font-size: 13px; opacity: .85; margin-top: 6px; }
+.inspire-origin {
+  display: inline-block;
+  margin-top: 12px;
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.3);
+  font-size: 12px; font-weight: 600;
+  padding: 5px 12px; border-radius: 16px;
+  backdrop-filter: blur(6px);
+}
+
+/* ── Loading / error / empty states ────────────────────── */
+.inspire-state {
+  text-align: center;
+  padding: 60px 30px;
+  color: #6b7280;
+  font-size: 14px;
+}
+.inspire-state-emoji { font-size: 40px; margin-bottom: 12px; }
+.inspire-spinner {
+  width: 34px; height: 34px;
+  margin: 0 auto 14px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #0064d6;
+  border-radius: 50%;
+  animation: inspire-spin .8s linear infinite;
+}
+@keyframes inspire-spin { to { transform: rotate(360deg); } }
+.inspire-retry {
+  margin-top: 14px;
+  background: #0064d6; color: #fff;
+  border: none; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  padding: 9px 22px; border-radius: 20px;
+}
+
+/* ── Toolbar (filter chips + actions) ──────────────────── */
+.inspire-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px;
+  padding: 14px 20px 4px;
+}
+.inspire-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.inspire-chip {
+  background: #fff; color: #4b5563;
+  border: 1px solid #e5e7eb; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  padding: 6px 13px; border-radius: 18px;
+}
+.inspire-chip-on { background: #00388c; color: #fff; border-color: #00388c; }
+.inspire-actions { display: flex; gap: 8px; }
+.inspire-surprise {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  color: #fff; border: none; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 7px 14px; border-radius: 18px;
+}
+.inspire-surprise:disabled { opacity: .5; cursor: default; }
+.inspire-refresh {
+  background: #fff; color: #4b5563;
+  border: 1px solid #e5e7eb; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  padding: 7px 13px; border-radius: 18px;
+}
+
+/* ── Place cards ───────────────────────────────────────── */
+.inspire-list {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 12px 20px 0;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.inspire-card {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+}
+.inspire-card-hit {
+  animation: inspire-hit 1.2s ease;
+  box-shadow: 0 0 0 2px #7c3aed, 0 4px 14px rgba(124,58,237,.25);
+}
+@keyframes inspire-hit {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.inspire-emoji { font-size: 24px; flex-shrink: 0; }
+.inspire-body { flex: 1; min-width: 0; }
+.inspire-name {
+  font-size: 15px; font-weight: 600; color: #111827;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.inspire-meta { font-size: 12px; color: #6b7280; margin-top: 3px; }
+.inspire-cuisine { text-transform: capitalize; }
+.inspire-go {
+  flex-shrink: 0;
+  background: #eef4ff; color: #0064d6;
+  text-decoration: none;
+  font-size: 12px; font-weight: 700;
+  padding: 8px 12px; border-radius: 16px;
+  white-space: nowrap;
+}
+.inspire-go:hover { background: #dbe8ff; }

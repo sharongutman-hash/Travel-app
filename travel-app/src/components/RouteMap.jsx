@@ -77,7 +77,7 @@ export default function RouteMap({ onStopClick }) {
       </div>
       <CategoryFilter cats={presentCats} active={activeCats} onToggle={toggleCat} />
 
-      <MapContainer ref={setMap} center={center} zoom={7} style={{ height: '100%', width: '100%' }} scrollWheelZoom zoomControl={false}>
+      <MapContainer ref={setMap} center={center} zoom={7} style={{ height: '100%', width: '100%' }} scrollWheelZoom zoomControl={false} gestureHandling>
         <TileLayer key={layer.id} attribution={layer.attribution} url={layer.url} />
         <FitBounds coords={allCoords} />
 

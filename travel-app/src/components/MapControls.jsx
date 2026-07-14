@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import L from 'leaflet'
 import { BASE_LAYERS } from '../mapLayers'
 import { useTrip } from '../TripContext'
@@ -57,6 +57,19 @@ export function CategoryFilter({ cats, active, onToggle }) {
 
 // Fullscreen toggle for the .map-wrap element. `map` = the Leaflet instance.
 export function FullscreenButton({ map }) {
+  // In fullscreen the page can't scroll, so the two-finger requirement is
+  // pure friction — suspend gesture handling until fullscreen exits.
+  useEffect(() => {
+    if (!map) return
+    const onFsChange = () => {
+      const gh = map.gestureHandling
+      if (gh) document.fullscreenElement ? gh.disable() : gh.enable()
+      setTimeout(() => map.invalidateSize(), 250)
+    }
+    document.addEventListener('fullscreenchange', onFsChange)
+    return () => document.removeEventListener('fullscreenchange', onFsChange)
+  }, [map])
+
   function toggle() {
     if (!map) return
     const el = map.getContainer().closest('.map-wrap') || map.getContainer()

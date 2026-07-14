@@ -4,6 +4,7 @@ import { useTrip } from '../TripContext'
 import { useLang } from '../LangContext'
 import { pick } from '../i18n'
 import RouteMap from '../components/RouteMap'
+import InspireBanner from '../components/InspireBanner'
 import './Home.css'
 
 const strings = {
@@ -242,6 +243,7 @@ export default function Home() {
             ))}
           </div>
         )}
+        <InspireBanner />
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import { useHotelDistances } from '../hooks/useRoute'
 import { useLang } from '../LangContext'
 import { translations, categoryTranslations, pick } from '../i18n'
 import DayMap from '../components/DayMap'
+import InspireBanner from '../components/InspireBanner'
 import { CategoryFilter } from '../components/MapControls'
 import './DayDetail.css'
 
@@ -73,11 +74,18 @@ function TabAttractions({ day, selectedSpotId, onSpotSelect, activeCats }) {
     byCategory[s.cat].push(s)
   })
 
-  if (allSpots.length === 0) return <div className="tab-content empty-state">{t.noAttractions}</div>
-  if (spots.length === 0) return <div className="tab-content empty-state">{t.noAttractions}</div>
+  if (allSpots.length === 0 || spots.length === 0) {
+    return (
+      <div className="tab-content">
+        <InspireBanner compact />
+        <div className="empty-state">{t.noAttractions}</div>
+      </div>
+    )
+  }
 
   return (
     <div className="tab-content">
+      <InspireBanner compact />
       {Object.entries(byCategory).map(([catKey, catSpots]) => {
         const cat = CATEGORIES[catKey]
         return (

@@ -6,6 +6,7 @@ import { TripLayout } from './TripContext'
 import Welcome from './pages/Welcome'
 import Home from './pages/Home'
 import DayDetail from './pages/DayDetail'
+import Inspire from './pages/Inspire'
 
 const basename = import.meta.env.BASE_URL
 
@@ -57,6 +58,7 @@ function AnimatedRoutes() {
         <Route path="/trip/:tripId" element={<TripLayout />}>
           <Route index element={<Home />} />
           <Route path="day/:dayId" element={<DayDetail />} />
+          <Route path="inspire" element={<Inspire />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
